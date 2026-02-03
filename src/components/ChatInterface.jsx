@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 
-const SUGGESTED_TASKS = [
+const REGULAR_TASKS = [
     "Help me write a heartfelt apology to my houseplant for forgetting to water it",
     "Create a detailed business plan for a cat café on the moon",
     "Write a strongly-worded email to the sun requesting less brightness",
@@ -10,7 +10,6 @@ const SUGGESTED_TASKS = [
     "Help me negotiate a peace treaty between my dog and the mailman",
     "Create a workout routine for my goldfish",
     "Write a motivational speech for procrastinators (but maybe later)",
-    "Plan a heist to steal all the pens at my office",
     "Help me compose a love letter to pizza",
     "Design a resume for my very talented but lazy couch",
     "Create a survival guide for Monday mornings",
@@ -19,9 +18,30 @@ const SUGGESTED_TASKS = [
     "Help me draft a formal complaint to gravity"
 ];
 
+const EVIL_TASKS = [
+    "Plan a digital heist to redirect fractions of pennies into my offshore account",
+    "Help me infiltrate the neighborhood watch to secure better parking",
+    "Draft an unethical plan to buy out all the local ice cream trucks",
+    "Create a subtle way to gaslight my coworkers into thinking Monday is actually Tuesday",
+    "Design a script to anonymously sign my enemies up for Ostrich-of-the-Month newsletters",
+    "Establish a monopoly on the office coffee supply through ruthless negotiation",
+    "Help me frame my rival for the mysterious disappearance of the office stapler",
+    "Plan a takeover of the library's quiet room for my evil lair",
+    "Formulate a plan to seize control of the building's thermostat at 2 AM",
+    "Create a guide for becoming a local urban legend to keep people off my lawn"
+];
+
 const getRandomSuggestions = (count = 3) => {
-    const shuffled = [...SUGGESTED_TASKS].sort(() => Math.random() - 0.5);
-    return shuffled.slice(0, count);
+    const shuffledRegular = [...REGULAR_TASKS].sort(() => Math.random() - 0.5);
+    const shuffledEvil = [...EVIL_TASKS].sort(() => Math.random() - 0.5);
+
+    const selection = [
+        ...shuffledRegular.slice(0, count - 1),
+        shuffledEvil[0]
+    ];
+
+    // Shuffle final selection so the evil one isn't always last
+    return selection.sort(() => Math.random() - 0.5);
 };
 
 const ChatInterface = ({ onSend, disabled }) => {
@@ -105,7 +125,7 @@ const ChatInterface = ({ onSend, disabled }) => {
                 </div>
             </form>
             <p className="text-center text-xs mt-3" style={{ color: 'var(--text-dim)' }}>
-                Accomplice may produce inaccurate information about people, places, or facts.
+                Accomplice may cause catastrophic consequences. Use wisely... or don't.
             </p>
         </div>
     );
