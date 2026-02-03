@@ -65,7 +65,7 @@ const SettingsDialog = ({ open, onClose, settings, onUpdateSettings }) => {
 
                             <button
                                 onClick={() => onUpdateSettings({ ...settings, style: 'evil_genius' })}
-                                className={`p-3 rounded-xl text-left flex items-center gap-3 settings-option ${settings.style === 'evil_genius' ? 'is-active' : ''}`}
+                                className={`p-3 rounded-xl text-left flex items-center gap-3 settings-option ${settings.style === 'evil_genius' ? 'is-active-evil' : ''}`}
                             >
                                 <div className="w-8 h-8 rounded-lg flex items-center justify-center text-lg" style={{ backgroundColor: 'rgba(239,68,68,0.2)' }}>
                                     🦹
@@ -73,6 +73,19 @@ const SettingsDialog = ({ open, onClose, settings, onUpdateSettings }) => {
                                 <div>
                                     <div className="font-medium text-sm" style={{ color: 'var(--text-primary)' }}>Evil Genius</div>
                                     <div className="text-xs" style={{ color: 'var(--text-dim)' }}>Villainous but creative</div>
+                                </div>
+                            </button>
+
+                            <button
+                                onClick={() => onUpdateSettings({ ...settings, style: 'monkeys_paw' })}
+                                className={`p-3 rounded-xl text-left flex items-center gap-3 settings-option ${settings.style === 'monkeys_paw' ? 'is-active-mystic' : ''}`}
+                            >
+                                <div className="w-8 h-8 rounded-lg flex items-center justify-center text-lg" style={{ backgroundColor: 'rgba(168, 85, 247, 0.2)' }}>
+                                    🐒
+                                </div>
+                                <div>
+                                    <div className="font-medium text-sm" style={{ color: 'var(--text-primary)' }}>Monkey's Paw</div>
+                                    <div className="text-xs" style={{ color: 'var(--text-dim)' }}>Be careful what you wish for</div>
                                 </div>
                             </button>
                         </div>

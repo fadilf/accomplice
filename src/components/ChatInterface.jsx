@@ -31,7 +31,25 @@ const EVIL_TASKS = [
     "Create a guide for becoming a local urban legend to keep people off my lawn"
 ];
 
-const getRandomSuggestions = (count = 3) => {
+const MONKEYS_PAW_TASKS = [
+    "I wish my family never had to worry about money again",
+    "I wish my house was perfectly clean and silent",
+    "I wish I could be with my late grandfather again",
+    "I wish I had the most powerful computer in the world",
+    "I wish for eternal world peace",
+    "I wish I could fly",
+    "I wish I was the smartest person on Earth",
+    "I wish for a never-ending summer",
+    "I wish my boss would stop emailing me",
+    "I wish I could see into the future"
+];
+
+const getRandomSuggestions = (style, count = 3) => {
+    if (style === 'monkeys_paw') {
+        const shuffled = [...MONKEYS_PAW_TASKS].sort(() => Math.random() - 0.5);
+        return shuffled.slice(0, count);
+    }
+
     const shuffledRegular = [...REGULAR_TASKS].sort(() => Math.random() - 0.5);
     const shuffledEvil = [...EVIL_TASKS].sort(() => Math.random() - 0.5);
 
@@ -44,12 +62,16 @@ const getRandomSuggestions = (count = 3) => {
     return selection.sort(() => Math.random() - 0.5);
 };
 
-const ChatInterface = ({ onSend, disabled }) => {
+const ChatInterface = ({ onSend, disabled, settings }) => {
     const [input, setInput] = useState('');
-    const [suggestions, setSuggestions] = useState(() => getRandomSuggestions());
+    const [suggestions, setSuggestions] = useState(() => getRandomSuggestions(settings?.style));
+
+    useEffect(() => {
+        setSuggestions(getRandomSuggestions(settings?.style));
+    }, [settings?.style]);
 
     const refreshSuggestions = () => {
-        setSuggestions(getRandomSuggestions());
+        setSuggestions(getRandomSuggestions(settings?.style));
     };
 
     const handleSuggestionClick = (suggestion) => {
