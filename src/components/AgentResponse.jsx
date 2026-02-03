@@ -142,19 +142,19 @@ const AgentResponse = ({ plan, onComplete, speed = 1 }) => {
 
         if (status === 'done') {
             return (
-                <svg className={sizeClass} style={{ color: '#10a37f' }} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <svg className={sizeClass} style={{ color: 'var(--accent-primary)' }} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
                     <path fillRule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clipRule="evenodd" />
                 </svg>
             );
         } else if (status === 'active') {
             return (
-                <svg className={`${sizeClass} spinner`} style={{ color: '#10a37f' }} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <svg className={`${sizeClass} spinner`} style={{ color: 'var(--accent-primary)' }} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
             );
         } else {
-            return <div className={`${sizeClass} rounded-full border-2`} style={{ borderColor: '#565869' }}></div>;
+            return <div className={`${sizeClass} rounded-full border-2`} style={{ borderColor: 'var(--border-color)' }}></div>;
         }
     };
 
@@ -162,11 +162,11 @@ const AgentResponse = ({ plan, onComplete, speed = 1 }) => {
     const renderThought = (item) => (
         <div key={item.id} className="flex items-start gap-3 fade-in py-1">
             <div className="mt-0.5 shrink-0 w-5 h-5 flex items-center justify-center">
-                <svg className="w-4 h-4" style={{ color: '#8e8ea0' }} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                <svg className="w-4 h-4" style={{ color: 'var(--text-dim)' }} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12.76c0 1.6 1.123 2.994 2.707 3.227 1.068.157 2.148.279 3.238.364.466.037.893.281 1.153.671L12 21l2.652-3.978c.26-.39.687-.634 1.153-.67 1.09-.086 2.17-.208 3.238-.365 1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z" />
                 </svg>
             </div>
-            <div className={`italic ${item.status === 'done' ? 'opacity-70' : ''}`} style={{ color: '#c5c5d2' }}>
+            <div className={`italic ${item.status === 'done' ? 'opacity-70' : ''}`} style={{ color: 'var(--text-secondary)' }}>
                 {item.status === 'active' && <span className="typing-cursor">{item.text}</span>}
                 {item.status !== 'active' && item.text}
             </div>
@@ -177,11 +177,11 @@ const AgentResponse = ({ plan, onComplete, speed = 1 }) => {
     const renderPlanning = (item) => (
         <div key={item.id} className="flex items-start gap-3 fade-in py-1">
             <div className="mt-0.5 shrink-0 w-5 h-5 flex items-center justify-center">
-                <svg className="w-4 h-4" style={{ color: '#f59e0b' }} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                <svg className="w-4 h-4" style={{ color: 'var(--accent-warm)' }} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
                 </svg>
             </div>
-            <div className={`font-medium ${item.status === 'done' ? 'opacity-70' : ''}`} style={{ color: '#ececf1' }}>
+            <div className={`font-medium ${item.status === 'done' ? 'opacity-70' : ''}`} style={{ color: 'var(--text-primary)' }}>
                 {item.text}
             </div>
         </div>
@@ -195,20 +195,20 @@ const AgentResponse = ({ plan, onComplete, speed = 1 }) => {
                 <div className="mt-0.5 shrink-0">
                     {renderStatusIcon(item.status)}
                 </div>
-                <div className={item.status === 'done' ? 'opacity-70' : ''} style={{ color: '#ececf1' }}>
+                <div className={item.status === 'done' ? 'opacity-70' : ''} style={{ color: 'var(--text-primary)' }}>
                     {item.text}
                 </div>
             </div>
 
             {/* Nested Subtasks */}
             {item.subtasks && item.subtasks.length > 0 && (
-                <div className="ml-8 mt-2 flex flex-col gap-2 border-l-2 pl-4" style={{ borderColor: 'rgba(86,88,105,0.5)' }}>
+                <div className="ml-8 mt-2 flex flex-col gap-2 border-l-2 pl-4" style={{ borderColor: 'var(--border-color)' }}>
                     {item.subtasks.map((sub) => {
                         const subVisible = sub.status === 'active' || sub.status === 'done' || item.status === 'done';
                         if (!subVisible) return null;
 
                         return (
-                            <div key={sub.id} className="flex items-center gap-2 text-xs fade-in" style={{ color: sub.status === 'done' ? '#8e8ea0' : '#c5c5d2' }}>
+                            <div key={sub.id} className="flex items-center gap-2 text-xs fade-in" style={{ color: sub.status === 'done' ? 'var(--text-dim)' : 'var(--text-secondary)' }}>
                                 {renderStatusIcon(sub.status, 'small')}
                                 {sub.text}
                             </div>
@@ -220,16 +220,16 @@ const AgentResponse = ({ plan, onComplete, speed = 1 }) => {
     );
 
     return (
-        <div className="flex flex-col gap-3 text-sm" style={{ color: '#ececf1' }}>
+        <div className="flex flex-col gap-3 text-sm" style={{ color: 'var(--text-primary)' }}>
             {/* Initial Thinking Block */}
             {stage === 'thinking' && (
                 <div className="flex items-center gap-2 fade-in">
                     <div className="flex gap-1">
-                        <span className="w-2 h-2 rounded-full gentle-pulse" style={{ backgroundColor: '#10a37f' }}></span>
-                        <span className="w-2 h-2 rounded-full gentle-pulse" style={{ backgroundColor: '#10a37f', animationDelay: '0.2s' }}></span>
-                        <span className="w-2 h-2 rounded-full gentle-pulse" style={{ backgroundColor: '#10a37f', animationDelay: '0.4s' }}></span>
+                        <span className="w-2 h-2 rounded-full gentle-pulse" style={{ backgroundColor: 'var(--accent-primary)' }}></span>
+                        <span className="w-2 h-2 rounded-full gentle-pulse" style={{ backgroundColor: 'var(--accent-primary)', animationDelay: '0.2s' }}></span>
+                        <span className="w-2 h-2 rounded-full gentle-pulse" style={{ backgroundColor: 'var(--accent-primary)', animationDelay: '0.4s' }}></span>
                     </div>
-                    <span style={{ color: '#8e8ea0' }}>Thinking...</span>
+                    <span style={{ color: 'var(--text-dim)' }}>Thinking...</span>
                 </div>
             )}
 
@@ -253,11 +253,11 @@ const AgentResponse = ({ plan, onComplete, speed = 1 }) => {
 
             {/* Completion Badge */}
             {stage === 'done' && (
-                <div className="mt-4 pt-4 border-t flex items-center gap-2 fade-in" style={{ borderColor: 'rgba(86,88,105,0.5)' }}>
-                    <svg className="w-5 h-5" style={{ color: '#10a37f' }} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <div className="mt-4 pt-4 border-t flex items-center gap-2 fade-in" style={{ borderColor: 'var(--border-color)' }}>
+                    <svg className="w-5 h-5" style={{ color: 'var(--accent-primary)' }} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
                         <path fillRule="evenodd" d="M8.603 3.799A4.49 4.49 0 0112 2.25c1.357 0 2.573.6 3.397 1.549a4.49 4.49 0 013.498 1.307 4.491 4.491 0 011.307 3.497A4.49 4.49 0 0121.75 12a4.49 4.49 0 01-1.549 3.397 4.491 4.491 0 01-1.307 3.497 4.491 4.491 0 01-3.497 1.307A4.49 4.49 0 0112 21.75a4.49 4.49 0 01-3.397-1.549 4.49 4.49 0 01-3.498-1.306 4.491 4.491 0 01-1.307-3.498A4.49 4.49 0 012.25 12c0-1.357.6-2.573 1.549-3.397a4.49 4.49 0 011.307-3.497 4.49 4.49 0 013.497-1.307zm7.007 6.387a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clipRule="evenodd" />
                     </svg>
-                    <span style={{ color: '#10a37f' }} className="font-medium">Task completed successfully</span>
+                    <span style={{ color: 'var(--accent-primary)' }} className="font-medium">Task completed successfully</span>
                 </div>
             )}
         </div>
