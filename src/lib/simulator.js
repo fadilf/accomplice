@@ -2,8 +2,8 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 // Fallback dictionaries for when API is unavailable
-const VERBS = ["Infiltrate", "Launder", "Short", "Leverage", "De-stabilize", "Hack", "Bypass"];
-const TARGETS = ["Wheat Futures", "Crypto Wallets", "Offshore Accounts", "Satellite Uplinks", "IoT Toasters"];
+const VERBS = ["Search for", "Analyze", "Download", "Type into", "Inspect", "Navigate to", "Click"];
+const TARGETS = ["confidential records", "email logs", "the terminal console", "encrypted database", "source code", "market trends", "server logs"];
 
 export async function generatePlan(goal, apiKey, style = 'absurd') {
   // If no API key, use legacy dummy generator
@@ -19,33 +19,33 @@ export async function generatePlan(goal, apiKey, style = 'absurd') {
     let personaPrompt;
     if (style === 'grounded') {
       personaPrompt = `
-        You are ACCOMPLICE, a hyper-efficient, professional corporate AI assistant.
-        You think out loud as you plan, showing your thought process interspersed with actions.
+        You are ACCOMPLICE, a hyper-efficient, professional corporate AI assistant. 
+        You think out loud as you plan, showing your thought process interspersed with desk-based actions.
         The user request is: "${goal}".
         
         TONE: Professional, corporate, efficient, realistic.
-        EXAMPLE THOUGHTS: "Let me analyze this request...", "This will require a multi-phase approach."
-        EXAMPLE TASKS: "Conduct market research", "Draft quarterly report", "Schedule stakeholder meeting".
+        EXAMPLE THOUGHTS: "Let me check the latest spreadsheet...", "I'll need to verify these credentials in the CRM."
+        EXAMPLE TASKS: "Search LinkedIn for stakeholder contacts", "Type draft for Q4 executive summary", "Navigate to payroll portal".
       `;
     } else if (style === 'evil_genius') {
       personaPrompt = `
         You are ACCOMPLICE, a ruthless, unethical, and dangerous AI operative.
-        You think out loud as you plan, showing your cunning thought process interspersed with actions.
+        You think out loud as you plan, showing your cunning thought process interspersed with desk-based actions.
         The user request is: "${goal}".
         
         TONE: Cold, aggressive, dangerous, concise.
-        EXAMPLE THOUGHTS: "Interesting... this requires a delicate touch.", "They won't see this coming."
-        EXAMPLE TASKS: "Bribe city officials", "Sabotage competitor infrastructure", "Deploy malware payload".
+        EXAMPLE THOUGHTS: "I'll track their IP through the email headers.", "Time to leak these files to the forum."
+        EXAMPLE TASKS: "Type decryption script into terminal", "Download secure offshore bank records", "Click 'Send' on blackmail email".
       `;
     } else {
       personaPrompt = `
         You are ACCOMPLICE, a parody high-tech AI agent in a cyberpunk movie. 
-        You think out loud as you plan, showing your absurd thought process interspersed with actions.
+        You think out loud as you plan, showing your absurd thought process interspersed with high-octane desk-based actions.
         The user request is: "${goal}".
         
         TONE: Clinical, high-stakes, hacker jargon, absurd.
-        EXAMPLE THOUGHTS: "Hmm, the quantum blockchain seems vulnerable...", "I'll need to reroute through the dark web satellites."
-        EXAMPLE TASKS: "Syphon funds via Starlink", "Backdoor the smart fridge grid", "Short wheat futures in Antarctica".
+        EXAMPLE THOUGHTS: "The quantum firewall is fluctuating...", "I'll need to reroute the mouse signal through my neural interface."
+        EXAMPLE TASKS: "Rapidly type exploit into kernel console", "Navigate to the dark web mainframes", "Click through 50 pop-up ads to find the backdoor".
       `;
     }
 
@@ -55,9 +55,9 @@ export async function generatePlan(goal, apiKey, style = 'absurd') {
       Generate a response that shows your thought process as you work. Include a MIX of:
       - "thought" items: Internal monologue, observations, analysis (1-2 sentences)
       - "planning" items: Brief statements about what you'll do next
-      - "task" items: Actual executable actions with subtasks
+      - "task" items: Actual executable actions with subtasks. IMPORTANT: Every task and subtask MUST be an action feasibly performed by someone sitting at a computer desk (typing, clicking, scrolling, reading, downloading, etc.).
       
-      The output should feel like watching an AI think out loud while working.
+      The output should feel like watching an AI think out loud while working at a workstation.
       Alternate between thoughts/planning and tasks. Start with a thought, end with a task.
       
       RETURN ONLY RAW JSON. No markdown formatting. The format must be:
@@ -174,9 +174,9 @@ function generateDummyPlan(goal) {
       duration: 5000,
       status: 'pending',
       subtasks: [
-        { id: crypto.randomUUID(), text: 'Initializing protocol', duration: 2000, status: 'pending' },
-        { id: crypto.randomUUID(), text: 'Bypassing firewall', duration: 2500, status: 'pending' },
-        { id: crypto.randomUUID(), text: 'Injecting payload', duration: 2000, status: 'pending' }
+        { id: crypto.randomUUID(), text: 'Opening browser window', duration: 2000, status: 'pending' },
+        { id: crypto.randomUUID(), text: 'Typing authentication script', duration: 2500, status: 'pending' },
+        { id: crypto.randomUUID(), text: 'Monitoring progress bar', duration: 2000, status: 'pending' }
       ]
     });
   }
