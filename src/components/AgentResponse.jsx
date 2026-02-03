@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 
-const AgentResponse = ({ plan, onComplete, speed = 1 }) => {
+const AgentResponse = ({ plan, onComplete, speed = 1, style }) => {
     const [stage, setStage] = useState('thinking'); // thinking, executing, done
     const [items, setItems] = useState([]);
     const [currentItemIndex, setCurrentItemIndex] = useState(0);
