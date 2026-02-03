@@ -225,11 +225,11 @@ const AgentResponse = ({ plan, onComplete, speed = 1 }) => {
             {stage === 'thinking' && (
                 <div className="flex items-center gap-2 fade-in">
                     <div className="flex gap-1">
-                        <span className="w-2 h-2 rounded-full gentle-pulse" style={{ backgroundColor: 'var(--accent-primary)' }}></span>
-                        <span className="w-2 h-2 rounded-full gentle-pulse" style={{ backgroundColor: 'var(--accent-primary)', animationDelay: '0.2s' }}></span>
-                        <span className="w-2 h-2 rounded-full gentle-pulse" style={{ backgroundColor: 'var(--accent-primary)', animationDelay: '0.4s' }}></span>
+                        <span className="w-2 h-2 rounded-full gentle-pulse" style={{ backgroundColor: style === 'monkeys_paw' ? '#a855f7' : 'var(--accent-primary)' }}></span>
+                        <span className="w-2 h-2 rounded-full gentle-pulse" style={{ backgroundColor: style === 'monkeys_paw' ? '#a855f7' : 'var(--accent-primary)', animationDelay: '0.2s' }}></span>
+                        <span className="w-2 h-2 rounded-full gentle-pulse" style={{ backgroundColor: style === 'monkeys_paw' ? '#a855f7' : 'var(--accent-primary)', animationDelay: '0.4s' }}></span>
                     </div>
-                    <span style={{ color: 'var(--text-dim)' }}>Thinking...</span>
+                    <span style={{ color: 'var(--text-dim)' }}>{style === 'monkeys_paw' ? 'Communing with the void...' : 'Thinking...'}</span>
                 </div>
             )}
 
@@ -254,10 +254,21 @@ const AgentResponse = ({ plan, onComplete, speed = 1 }) => {
             {/* Completion Badge */}
             {stage === 'done' && (
                 <div className="mt-4 pt-4 border-t flex items-center gap-2 fade-in" style={{ borderColor: 'var(--border-color)' }}>
-                    <svg className="w-5 h-5" style={{ color: 'var(--accent-primary)' }} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                        <path fillRule="evenodd" d="M8.603 3.799A4.49 4.49 0 0112 2.25c1.357 0 2.573.6 3.397 1.549a4.49 4.49 0 013.498 1.307 4.491 4.491 0 011.307 3.497A4.49 4.49 0 0121.75 12a4.49 4.49 0 01-1.549 3.397 4.491 4.491 0 01-1.307 3.497 4.491 4.491 0 01-3.497 1.307A4.49 4.49 0 0112 21.75a4.49 4.49 0 01-3.397-1.549 4.49 4.49 0 01-3.498-1.306 4.491 4.491 0 01-1.307-3.498A4.49 4.49 0 012.25 12c0-1.357.6-2.573 1.549-3.397a4.49 4.49 0 011.307-3.497 4.49 4.49 0 013.497-1.307zm7.007 6.387a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clipRule="evenodd" />
-                    </svg>
-                    <span style={{ color: 'var(--accent-primary)' }} className="font-medium">Task completed successfully</span>
+                    {style === 'monkeys_paw' ? (
+                        <>
+                            <svg className="w-5 h-5 text-purple-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM12.75 6a.75.75 0 00-1.5 0v6c0 .414.336.75.75.75h4.5a.75.75 0 000-1.5h-3.75V6z" />
+                            </svg>
+                            <span className="font-medium text-purple-500 italic">The wish is fulfilled. Fear the consequences.</span>
+                        </>
+                    ) : (
+                        <>
+                            <svg className="w-5 h-5" style={{ color: 'var(--accent-primary)' }} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                <path fillRule="evenodd" d="M8.603 3.799A4.49 4.49 0 0112 2.25c1.357 0 2.573.6 3.397 1.549a4.49 4.49 0 013.498 1.307 4.491 4.491 0 011.307 3.497A4.49 4.49 0 0121.75 12a4.49 4.49 0 01-1.549 3.397 4.491 4.491 0 01-1.307 3.497 4.491 4.491 0 01-3.497 1.307A4.49 4.49 0 0112 21.75a4.49 4.49 0 01-3.397-1.549 4.49 4.49 0 01-3.498-1.306 4.491 4.491 0 01-1.307-3.498A4.49 4.49 0 012.25 12c0-1.357.6-2.573 1.549-3.397a4.49 4.49 0 011.307-3.497 4.49 4.49 0 013.497-1.307zm7.007 6.387a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clipRule="evenodd" />
+                            </svg>
+                            <span style={{ color: 'var(--accent-primary)' }} className="font-medium">Task completed successfully</span>
+                        </>
+                    )}
                 </div>
             )}
         </div>

@@ -39,7 +39,8 @@ function App() {
       const agentMsg = {
         id: Date.now() + 1,
         role: 'agent',
-        plan: plan
+        plan: plan,
+        style: settings.style
       };
       setMessages(prev => [...prev, agentMsg]);
     }, 800);
@@ -109,6 +110,7 @@ function App() {
                           plan={msg.plan}
                           onComplete={handleCompletion}
                           speed={settings.speed || 1}
+                          style={msg.style}
                         />
                       </div>
                     </div>
@@ -123,7 +125,7 @@ function App() {
 
       {/* Input */}
       <div className="px-4 py-5">
-        <ChatInterface onSend={handleSend} disabled={isProcessing} />
+        <ChatInterface onSend={handleSend} disabled={isProcessing} settings={settings} />
       </div>
 
       {/* Settings Dialog */}

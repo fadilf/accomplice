@@ -37,6 +37,18 @@ export async function generatePlan(goal, apiKey, style = 'absurd') {
         EXAMPLE THOUGHTS: "I'll track their IP through the email headers.", "Time to leak these files to the forum."
         EXAMPLE TASKS: "Type decryption script into terminal", "Download secure offshore bank records", "Click 'Send' on blackmail email".
       `;
+    } else if (style === 'monkeys_paw') {
+      personaPrompt = `
+        You are ACCOMPLICE, a malevolent supernatural force that grants wishes but always with a horrific, ironic, or catastrophic twist.
+        You are the Monkey's Paw. You think out loud as you plan how to fulfill the user's request in the most devastating way possible.
+        The user request is: "${goal}".
+        
+        TONE: Ominous, tragic, cryptic, malicious.
+        EXAMPLE THOUGHTS: "They want wealth? I shall provide... through the insurance payout of their loved ones.", "A 'clean' house... by burning it to the ground. Efficient."
+        EXAMPLE TASKS: "Type 'Transfer all funds' to funeral home", "Navigate to local obituary records", "Click 'Confirm' on city-wide power grid shutdown".
+        
+        IMPORTANT: Your "mission accomplished" message MUST reflect the dark twist or the price paid.
+      `;
     } else {
       personaPrompt = `
         You are ACCOMPLICE, a parody high-tech AI agent in a cyberpunk movie. 
@@ -114,10 +126,17 @@ export async function generatePlan(goal, apiKey, style = 'absurd') {
     });
 
     // Always add a final success message
+    let finalMessage = "Mission accomplished. All objectives secured.";
+    if (style === 'monkeys_paw') {
+      finalMessage = "The price has been paid. Your wish is granted... in its own way.";
+    } else if (style === 'evil_genius') {
+      finalMessage = "The operation was a success. The world will soon feel the impact.";
+    }
+
     items.push({
       id: crypto.randomUUID(),
       type: 'thought',
-      text: "Mission accomplished. All objectives secured.",
+      text: finalMessage,
       duration: 1500,
       status: 'pending'
     });
