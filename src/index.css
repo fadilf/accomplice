@@ -1,30 +1,31 @@
 @import "tailwindcss";
 
 :root {
-  --bg-color: #050505;
-  --panel-bg: #111;
-  --text-primary: #e0e0e0;
-  --text-dim: #888;
-  --accent-primary: #00ff9d;
-  /* Neon Green */
-  --accent-secondary: #00d8ff;
-  /* Cyan */
-  --accent-warn: #ffcc00;
-  --accent-alert: #ff3366;
-  --font-mono: 'Space Mono', 'Courier New', monospace;
-  --font-ui: 'Inter', system-ui, sans-serif;
-  --border-color: #333;
+  --bg-main: #343541;
+  --bg-sidebar: #202123;
+  --bg-message-user: #343541;
+  --bg-message-assistant: #444654;
+  --text-primary: #ececf1;
+  --text-secondary: #c5c5d2;
+  --text-dim: #8e8ea0;
+  --border-color: #565869;
+  --accent-primary: #10a37f;
+  --accent-hover: #1a7f64;
+  --font-ui: 'Söhne', 'ui-sans-serif', 'system-ui', -apple-system, 'Segoe UI', Roboto, Ubuntu, Cantarell, 'Noto Sans', sans-serif;
+  --font-mono: 'Söhne Mono', 'Monaco', 'Andale Mono', 'Ubuntu Mono', monospace;
 }
 
 body {
   margin: 0;
   padding: 0;
-  background-color: var(--bg-color);
+  background-color: var(--bg-main);
   color: var(--text-primary);
   font-family: var(--font-ui);
   height: 100vh;
   width: 100vw;
   overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 #root {
@@ -32,29 +33,25 @@ body {
   width: 100%;
 }
 
-/* Scrollbar */
+/* Scrollbar - ChatGPT style */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--bg-color);
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--border-color);
-  border-radius: 4px;
+  background: rgba(217, 217, 227, 0.2);
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--text-dim);
+  background: rgba(217, 217, 227, 0.4);
 }
 
-/* Utilities */
-.mono {
-  font-family: var(--font-mono);
-}
-
+/* Utility classes */
 .text-accent {
   color: var(--accent-primary);
 }
@@ -63,81 +60,65 @@ body {
   color: var(--text-dim);
 }
 
-.text-warn {
-  color: var(--accent-warn);
-}
-
-.text-alert {
-  color: var(--accent-alert);
-}
-
-/* Animations */
-@keyframes flicker {
-  0% {
-    opacity: 1;
-  }
-
-  5% {
-    opacity: 0.8;
-  }
-
-  10% {
-    opacity: 1;
-  }
-
-  15% {
-    opacity: 0.3;
-  }
-
-  20% {
-    opacity: 1;
-  }
-
-  100% {
-    opacity: 1;
-  }
-}
-
-.glitch {
-  animation: flicker 4s infinite;
-}
-
-.scanline {
-  width: 100%;
-  height: 2px;
-  background: rgba(0, 255, 157, 0.1);
-  position: absolute;
-  top: 0;
-  left: 0;
-  animation: scan 6s linear infinite;
-  pointer-events: none;
-  z-index: 9999;
-}
-
-@keyframes scan {
+/* Smooth fade-in animation */
+@keyframes fadeIn {
   from {
-    top: 0%;
+    opacity: 0;
+    transform: translateY(10px);
   }
 
   to {
-    top: 100%;
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-@keyframes pulse {
-  0% {
-    box-shadow: 0 0 0 0 rgba(0, 255, 157, 0.4);
+.fade-in {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+/* Typing indicator */
+@keyframes blink {
+
+  0%,
+  50% {
+    opacity: 1;
   }
 
-  70% {
-    box-shadow: 0 0 0 10px rgba(0, 255, 157, 0);
-  }
-
+  51%,
   100% {
-    box-shadow: 0 0 0 0 rgba(0, 255, 157, 0);
+    opacity: 0;
   }
 }
 
-.pulse-effect {
-  animation: pulse 2s infinite;
+.typing-cursor {
+  animation: blink 1s infinite;
+}
+
+/* Subtle pulse for loading states */
+@keyframes gentlePulse {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.gentle-pulse {
+  animation: gentlePulse 2s ease-in-out infinite;
+}
+
+/* Spinner animation */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
 }

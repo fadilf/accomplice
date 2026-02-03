@@ -1,95 +1,263 @@
+import React, { useState, useEffect, useRef } from 'react';
 
-import React, { useState, useEffect } from 'react';
-
-const AgentResponse = ({ plan, onComplete }) => {
-    const [stage, setStage] = useState('thinking'); // thinking, planning, executing, done
-    const [steps, setSteps] = useState([]);
-    const [currentStepIndex, setCurrentStepIndex] = useState(0);
+const AgentResponse = ({ plan, onComplete, speed = 1 }) => {
+    const [stage, setStage] = useState('thinking'); // thinking, executing, done
+    const [items, setItems] = useState([]);
+    const [currentItemIndex, setCurrentItemIndex] = useState(0);
+    const [currentSubtaskIndex, setCurrentSubtaskIndex] = useState(-1);
+    const bottomRef = useRef(null);
 
     useEffect(() => {
         if (plan) {
-            setSteps(plan);
+            setItems(plan);
             setStage('thinking');
 
-            // Simulate thinking time
+            // Brief thinking delay before starting
             setTimeout(() => {
-                setStage('planning');
-                setTimeout(() => {
-                    setStage('executing');
-                }, 1500);
-            }, 2000);
+                setStage('executing');
+            }, 1500 / speed);
         }
     }, [plan]);
 
     useEffect(() => {
-        if (stage === 'executing' && currentStepIndex < steps.length) {
-            const currentStep = steps[currentStepIndex];
+        if (stage !== 'executing') return;
 
-            // Mark current as active
-            setSteps(prev => prev.map((s, i) => i === currentStepIndex ? { ...s, status: 'active' } : s));
-
-            const timer = setTimeout(() => {
-                // Mark current as done
-                setSteps(prev => prev.map((s, i) => i === currentStepIndex ? { ...s, status: 'done' } : s));
-                setCurrentStepIndex(prev => prev + 1);
-            }, currentStep.duration);
-
-            return () => clearTimeout(timer);
-        } else if (stage === 'executing' && currentStepIndex >= steps.length) {
+        if (currentItemIndex >= items.length) {
             setStage('done');
             if (onComplete) onComplete();
+            setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
+            return;
         }
-    }, [stage, currentStepIndex, steps.length]);
+
+        const currentItem = items[currentItemIndex];
+
+        // Handle thought and planning types - simple timed display
+        if (currentItem.type === 'thought' || currentItem.type === 'planning') {
+            // Mark as active
+            setItems(prev => {
+                const newItems = [...prev];
+                newItems[currentItemIndex] = { ...newItems[currentItemIndex], status: 'active' };
+                return newItems;
+            });
+
+            bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+
+            const timer = setTimeout(() => {
+                // Mark as done
+                setItems(prev => {
+                    const newItems = [...prev];
+                    newItems[currentItemIndex] = { ...newItems[currentItemIndex], status: 'done' };
+                    return newItems;
+                });
+                setCurrentItemIndex(prev => prev + 1);
+            }, currentItem.duration / speed);
+
+            return () => clearTimeout(timer);
+        }
+
+        // Handle task type - with subtasks
+        if (currentItem.type === 'task') {
+            const subtasks = currentItem.subtasks || [];
+            const hasSubtasks = subtasks.length > 0;
+
+            // --- SUBTASK EXECUTION LOOP ---
+            if (hasSubtasks && currentSubtaskIndex >= 0 && currentSubtaskIndex < subtasks.length) {
+                const activeSub = subtasks[currentSubtaskIndex];
+
+                // Mark subtask active
+                setItems(prev => {
+                    const newItems = [...prev];
+                    const activeSubs = [...newItems[currentItemIndex].subtasks];
+                    activeSubs[currentSubtaskIndex] = { ...activeSubs[currentSubtaskIndex], status: 'active' };
+                    newItems[currentItemIndex] = { ...newItems[currentItemIndex], subtasks: activeSubs };
+                    return newItems;
+                });
+
+                bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+
+                const timer = setTimeout(() => {
+                    // Mark subtask done
+                    setItems(prev => {
+                        const newItems = [...prev];
+                        const activeSubs = [...newItems[currentItemIndex].subtasks];
+                        activeSubs[currentSubtaskIndex] = { ...activeSubs[currentSubtaskIndex], status: 'done' };
+                        newItems[currentItemIndex] = { ...newItems[currentItemIndex], subtasks: activeSubs };
+                        return newItems;
+                    });
+                    setCurrentSubtaskIndex(prev => prev + 1);
+                }, activeSub.duration / speed);
+
+                return () => clearTimeout(timer);
+            }
+
+            // --- SUBTASK COMPLETION / TASK ADVANCE ---
+            else if (hasSubtasks && currentSubtaskIndex >= subtasks.length) {
+                // All subtasks done, finish main task
+                setItems(prev => {
+                    const newItems = [...prev];
+                    newItems[currentItemIndex] = { ...newItems[currentItemIndex], status: 'done' };
+                    return newItems;
+                });
+
+                setCurrentItemIndex(prev => prev + 1);
+                setCurrentSubtaskIndex(-1);
+            }
+
+            // --- TASK INITIATION ---
+            else if (currentSubtaskIndex === -1) {
+                // Activate Task
+                setItems(prev => {
+                    const newItems = [...prev];
+                    newItems[currentItemIndex] = { ...newItems[currentItemIndex], status: 'active' };
+                    return newItems;
+                });
+
+                bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+
+                if (hasSubtasks) {
+                    // Start subtasks immediately
+                    setCurrentSubtaskIndex(0);
+                } else {
+                    // No subtasks, wait duration then finish
+                    const timer = setTimeout(() => {
+                        setItems(prev => {
+                            const newItems = [...prev];
+                            newItems[currentItemIndex] = { ...newItems[currentItemIndex], status: 'done' };
+                            return newItems;
+                        });
+                        setCurrentItemIndex(prev => prev + 1);
+                    }, currentItem.duration / speed);
+                    return () => clearTimeout(timer);
+                }
+            }
+        }
+
+    }, [stage, currentItemIndex, currentSubtaskIndex, items.length]);
 
     if (!plan) return null;
 
-    return (
-        <div className="flex flex-col gap-4 max-w-2xl w-full mx-auto my-6 text-sm">
-            {/* Thinking Block */}
-            <div className={`border border-gray-800 bg-gray-900/40 rounded p-3 transition-all duration-300 ${stage === 'thinking' ? 'animate-pulse' : ''}`}>
-                <div className="flex items-center gap-2 text-gray-400 mb-1">
-                    <span className="text-xs uppercase tracking-wider font-bold">Thought Process</span>
-                    {stage === 'thinking' && <span className="w-2 h-2 rounded-full bg-cyan-500 animate-ping" />}
+    // Render icons
+    const renderStatusIcon = (status, size = 'normal') => {
+        const sizeClass = size === 'small' ? 'w-4 h-4' : 'w-5 h-5';
+
+        if (status === 'done') {
+            return (
+                <svg className={sizeClass} style={{ color: '#10a37f' }} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                    <path fillRule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clipRule="evenodd" />
+                </svg>
+            );
+        } else if (status === 'active') {
+            return (
+                <svg className={`${sizeClass} spinner`} style={{ color: '#10a37f' }} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+            );
+        } else {
+            return <div className={`${sizeClass} rounded-full border-2`} style={{ borderColor: '#565869' }}></div>;
+        }
+    };
+
+    // Render thought item
+    const renderThought = (item) => (
+        <div key={item.id} className="flex items-start gap-3 fade-in py-1">
+            <div className="mt-0.5 shrink-0 w-5 h-5 flex items-center justify-center">
+                <svg className="w-4 h-4" style={{ color: '#8e8ea0' }} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12.76c0 1.6 1.123 2.994 2.707 3.227 1.068.157 2.148.279 3.238.364.466.037.893.281 1.153.671L12 21l2.652-3.978c.26-.39.687-.634 1.153-.67 1.09-.086 2.17-.208 3.238-.365 1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z" />
+                </svg>
+            </div>
+            <div className={`italic ${item.status === 'done' ? 'opacity-70' : ''}`} style={{ color: '#c5c5d2' }}>
+                {item.status === 'active' && <span className="typing-cursor">{item.text}</span>}
+                {item.status !== 'active' && item.text}
+            </div>
+        </div>
+    );
+
+    // Render planning item
+    const renderPlanning = (item) => (
+        <div key={item.id} className="flex items-start gap-3 fade-in py-1">
+            <div className="mt-0.5 shrink-0 w-5 h-5 flex items-center justify-center">
+                <svg className="w-4 h-4" style={{ color: '#f59e0b' }} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
+                </svg>
+            </div>
+            <div className={`font-medium ${item.status === 'done' ? 'opacity-70' : ''}`} style={{ color: '#ececf1' }}>
+                {item.text}
+            </div>
+        </div>
+    );
+
+    // Render task item
+    const renderTask = (item) => (
+        <div key={item.id} className="fade-in">
+            {/* Main Task Item */}
+            <div className="flex items-start gap-3 py-1">
+                <div className="mt-0.5 shrink-0">
+                    {renderStatusIcon(item.status)}
                 </div>
-                <div className="text-gray-300 font-mono text-xs">
-                    {stage === 'thinking' ? "Analyzing request vectors... Simulating outcomes... Drafting accomplice protocols..." : "Analysis complete. Optimization potential: Critical. Strategy mapped."}
+                <div className={item.status === 'done' ? 'opacity-70' : ''} style={{ color: '#ececf1' }}>
+                    {item.text}
                 </div>
             </div>
 
-            {/* Plan & Execution */}
-            {(stage === 'planning' || stage === 'executing' || stage === 'done') && (
-                <div className="border border-gray-800 bg-black/80 rounded p-4 shadow-2xl relative overflow-hidden">
-                    <div className="scanline"></div>
-                    <h3 className="text-accent mb-4 font-mono text-lg flex items-center gap-2">
-                        <span className="text-gray-600">&gt;&gt;</span> OPERATION MANIFEST
-                    </h3>
+            {/* Nested Subtasks */}
+            {item.subtasks && item.subtasks.length > 0 && (
+                <div className="ml-8 mt-2 flex flex-col gap-2 border-l-2 pl-4" style={{ borderColor: 'rgba(86,88,105,0.5)' }}>
+                    {item.subtasks.map((sub) => {
+                        const subVisible = sub.status === 'active' || sub.status === 'done' || item.status === 'done';
+                        if (!subVisible) return null;
 
-                    <div className="flex flex-col gap-3">
-                        {steps.map((step, idx) => (
-                            <div key={step.id} className={`flex items-start gap-3 p-2 rounded border border-transparent transition-all duration-300 ${step.status === 'active' ? 'bg-gray-900 border-gray-700' :
-                                step.status === 'done' ? 'opacity-50' : 'opacity-30'
-                                }`}>
-                                <div className={`mt-1 w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${step.status === 'done' ? 'border-green-500 bg-green-500/20' :
-                                    step.status === 'active' ? 'border-cyan-500 animate-spin border-t-transparent' :
-                                        'border-gray-600'
-                                    }`}>
-                                    {step.status === 'done' && <div className="w-2 h-2 bg-green-500 rounded-full" />}
-                                </div>
-                                <div className={`font-mono ${step.status === 'active' ? 'text-cyan-400' :
-                                    step.status === 'done' ? 'text-green-400 line-through' :
-                                        'text-gray-500'
-                                    }`}>
-                                    {step.text}
-                                </div>
+                        return (
+                            <div key={sub.id} className="flex items-center gap-2 text-xs fade-in" style={{ color: sub.status === 'done' ? '#8e8ea0' : '#c5c5d2' }}>
+                                {renderStatusIcon(sub.status, 'small')}
+                                {sub.text}
                             </div>
-                        ))}
-                    </div>
+                        );
+                    })}
+                </div>
+            )}
+        </div>
+    );
 
-                    {stage === 'done' && (
-                        <div className="mt-6 p-3 bg-green-500/10 border border-green-500/30 text-green-400 text-center font-bold tracking-widest animate-pulse">
-                            MISSION ACCOMPLISHED / ASSETS SECURED
-                        </div>
-                    )}
+    return (
+        <div className="flex flex-col gap-3 text-sm" style={{ color: '#ececf1' }}>
+            {/* Initial Thinking Block */}
+            {stage === 'thinking' && (
+                <div className="flex items-center gap-2 fade-in">
+                    <div className="flex gap-1">
+                        <span className="w-2 h-2 rounded-full gentle-pulse" style={{ backgroundColor: '#10a37f' }}></span>
+                        <span className="w-2 h-2 rounded-full gentle-pulse" style={{ backgroundColor: '#10a37f', animationDelay: '0.2s' }}></span>
+                        <span className="w-2 h-2 rounded-full gentle-pulse" style={{ backgroundColor: '#10a37f', animationDelay: '0.4s' }}></span>
+                    </div>
+                    <span style={{ color: '#8e8ea0' }}>Thinking...</span>
+                </div>
+            )}
+
+            {/* Execution - Render all visible items */}
+            {(stage === 'executing' || stage === 'done') && (
+                <div className="flex flex-col gap-2">
+                    {items.map((item) => {
+                        const isVisible = item.status === 'active' || item.status === 'done';
+                        if (!isVisible) return null;
+
+                        if (item.type === 'thought') return renderThought(item);
+                        if (item.type === 'planning') return renderPlanning(item);
+                        if (item.type === 'task') return renderTask(item);
+
+                        // Fallback for legacy format (no type)
+                        return renderTask({ ...item, type: 'task' });
+                    })}
+                    <div ref={bottomRef} />
+                </div>
+            )}
+
+            {/* Completion Badge */}
+            {stage === 'done' && (
+                <div className="mt-4 pt-4 border-t flex items-center gap-2 fade-in" style={{ borderColor: 'rgba(86,88,105,0.5)' }}>
+                    <svg className="w-5 h-5" style={{ color: '#10a37f' }} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                        <path fillRule="evenodd" d="M8.603 3.799A4.49 4.49 0 0112 2.25c1.357 0 2.573.6 3.397 1.549a4.49 4.49 0 013.498 1.307 4.491 4.491 0 011.307 3.497A4.49 4.49 0 0121.75 12a4.49 4.49 0 01-1.549 3.397 4.491 4.491 0 01-1.307 3.497 4.491 4.491 0 01-3.497 1.307A4.49 4.49 0 0112 21.75a4.49 4.49 0 01-3.397-1.549 4.49 4.49 0 01-3.498-1.306 4.491 4.491 0 01-1.307-3.498A4.49 4.49 0 012.25 12c0-1.357.6-2.573 1.549-3.397a4.49 4.49 0 011.307-3.497 4.49 4.49 0 013.497-1.307zm7.007 6.387a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clipRule="evenodd" />
+                    </svg>
+                    <span style={{ color: '#10a37f' }} className="font-medium">Task completed successfully</span>
                 </div>
             )}
         </div>
