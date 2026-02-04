@@ -25,7 +25,6 @@ const AgentResponse = ({ plan, onComplete, speed = 1, style }) => {
         if (currentItemIndex >= items.length) {
             setStage('done');
             if (onComplete) onComplete();
-            setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
             return;
         }
 
@@ -36,11 +35,10 @@ const AgentResponse = ({ plan, onComplete, speed = 1, style }) => {
             // Mark as active
             setItems(prev => {
                 const newItems = [...prev];
+                if (newItems[currentItemIndex].status === 'active') return newItems;
                 newItems[currentItemIndex] = { ...newItems[currentItemIndex], status: 'active' };
                 return newItems;
             });
-
-            bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
 
             const timer = setTimeout(() => {
                 // Mark as done
@@ -68,12 +66,11 @@ const AgentResponse = ({ plan, onComplete, speed = 1, style }) => {
                 setItems(prev => {
                     const newItems = [...prev];
                     const activeSubs = [...newItems[currentItemIndex].subtasks];
+                    if (activeSubs[currentSubtaskIndex].status === 'active') return newItems;
                     activeSubs[currentSubtaskIndex] = { ...activeSubs[currentSubtaskIndex], status: 'active' };
                     newItems[currentItemIndex] = { ...newItems[currentItemIndex], subtasks: activeSubs };
                     return newItems;
                 });
-
-                bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
 
                 const timer = setTimeout(() => {
                     // Mark subtask done
@@ -108,11 +105,10 @@ const AgentResponse = ({ plan, onComplete, speed = 1, style }) => {
                 // Activate Task
                 setItems(prev => {
                     const newItems = [...prev];
+                    if (newItems[currentItemIndex].status === 'active') return newItems;
                     newItems[currentItemIndex] = { ...newItems[currentItemIndex], status: 'active' };
                     return newItems;
                 });
-
-                bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
 
                 if (hasSubtasks) {
                     // Start subtasks immediately
@@ -132,7 +128,20 @@ const AgentResponse = ({ plan, onComplete, speed = 1, style }) => {
             }
         }
 
-    }, [stage, currentItemIndex, currentSubtaskIndex, items.length]);
+    }, [stage, currentItemIndex, currentSubtaskIndex, items.length, speed]);
+
+    // Unified scroll effect that is less aggressive
+    useEffect(() => {
+        if (stage === 'executing') {
+            const timeoutId = setTimeout(() => {
+                bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 50);
+            return () => clearTimeout(timeoutId);
+        }
+        if (stage === 'done') {
+            bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        }
+    }, [items, stage, currentItemIndex, currentSubtaskIndex]);
 
     if (!plan) return null;
 

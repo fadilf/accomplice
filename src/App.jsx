@@ -2,15 +2,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import ChatInterface from './components/ChatInterface';
 import AgentResponse from './components/AgentResponse';
-import SettingsDialog from './components/SettingsDialog';
 import { generatePlan } from './lib/simulator';
 
 function App() {
   const [messages, setMessages] = useState([]);
   const [currentPlan, setCurrentPlan] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [settingsOpen, setSettingsOpen] = useState(false);
-  const [settings, setSettings] = useState({ style: 'evil_genius' });
+  const [settings, setSettings] = useState({ style: 'evil_genius', speed: 1 });
+  const [isFastForward, setIsFastForward] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -40,7 +40,8 @@ function App() {
         id: Date.now() + 1,
         role: 'agent',
         plan: plan,
-        style: settings.style
+        style: settings.style,
+        fastForward: isFastForward // Capture current FF state for this message
       };
       setMessages(prev => [...prev, agentMsg]);
     }, 800);
@@ -48,7 +49,18 @@ function App() {
 
   const handleCompletion = () => {
     setIsProcessing(false);
+    setIsFastForward(false); // Reset fast forward when task completes
   };
+
+  const STYLES = [
+    { id: 'absurd', label: 'Absurd', icon: '🎭' },
+    { id: 'grounded', label: 'Grounded', icon: '💼' },
+    { id: 'evil_genius', label: 'Evil Genius', icon: '🦹' },
+    { id: 'monkeys_paw', label: 'Monkey\'s Paw', icon: '🐒' }
+  ];
+
+  const currentStyleLabel = STYLES.find(s => s.id === settings.style)?.label || 'Style';
+  const currentStyleIcon = STYLES.find(s => s.id === settings.style)?.icon || '⚙️';
 
   return (
     <div className="h-screen flex flex-col app-shell">
@@ -60,17 +72,45 @@ function App() {
             <h1 className="text-base font-semibold font-display" style={{ color: 'var(--text-primary)' }}>Accomplice</h1>
           </div>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="relative">
           <button
-            onClick={() => setSettingsOpen(true)}
-            className="p-2 rounded-md icon-button"
-            title="Settings"
+            onClick={() => setDropdownOpen(!dropdownOpen)}
+            className="flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200 hover:bg-white/5 active:scale-95"
+            style={{ border: '1px solid var(--border-color)', color: 'var(--text-primary)' }}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 010 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 010-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z" />
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0Z" />
+            <span>{currentStyleIcon}</span>
+            <span>{currentStyleLabel}</span>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={`w-4 h-4 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
             </svg>
           </button>
+
+          {dropdownOpen && (
+            <>
+              <div className="fixed inset-0 z-10" onClick={() => setDropdownOpen(false)}></div>
+              <div className="absolute right-0 mt-2 w-48 rounded-xl p-1 z-20 shadow-2xl animate-in fade-in zoom-in duration-200 border border-white/10" style={{ backgroundColor: 'rgb(13, 18, 28)', backdropFilter: 'blur(12px)' }}>
+                {STYLES.map((style) => (
+                  <button
+                    key={style.id}
+                    onClick={() => {
+                      setSettings({ ...settings, style: style.id });
+                      setDropdownOpen(false);
+                    }}
+                    className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-left transition-colors hover:bg-white/5 ${settings.style === style.id ? 'bg-white/10' : ''}`}
+                    style={{ color: 'var(--text-primary)' }}
+                  >
+                    <span>{style.icon}</span>
+                    <span>{style.label}</span>
+                    {settings.style === style.id && (
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4 ml-auto text-emerald-500">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                      </svg>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
         </div>
       </header>
 
@@ -109,7 +149,7 @@ function App() {
                         <AgentResponse
                           plan={msg.plan}
                           onComplete={handleCompletion}
-                          speed={settings.speed || 1}
+                          speed={(msg.id === messages[messages.length - 1]?.id && isProcessing && isFastForward) ? (settings.speed || 1) * 3 : (settings.speed || 1)}
                           style={msg.style}
                         />
                       </div>
@@ -123,18 +163,15 @@ function App() {
         </div>
       </main>
 
-      {/* Input */}
       <div className="px-4 py-5">
-        <ChatInterface onSend={handleSend} disabled={isProcessing} settings={settings} />
+        <ChatInterface
+          onSend={handleSend}
+          disabled={isProcessing}
+          settings={settings}
+          isFastForward={isFastForward}
+          onFastForwardToggle={() => setIsFastForward(!isFastForward)}
+        />
       </div>
-
-      {/* Settings Dialog */}
-      <SettingsDialog
-        open={settingsOpen}
-        onClose={() => setSettingsOpen(false)}
-        settings={settings}
-        onUpdateSettings={setSettings}
-      />
     </div>
   );
 }
