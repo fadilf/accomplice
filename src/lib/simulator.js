@@ -5,11 +5,14 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 const VERBS = ["Search for", "Analyze", "Download", "Type into", "Inspect", "Navigate to", "Click"];
 const TARGETS = ["confidential records", "email logs", "the terminal console", "encrypted database", "source code", "market trends", "server logs"];
 
+const MYSTIC_VERBS = ["Inscribe", "Manifest", "Extract", "Sever", "Bind", "Channel", "Invoke"];
+const MYSTIC_TARGETS = ["karmic debts", "soul fragments", "forgotten memories", "ancestral records", "temporal echoes", "shadow archives", "destiny threads"];
+
 export async function generatePlan(goal, apiKey, style = 'absurd') {
   // If no API key, use legacy dummy generator
   if (!apiKey) {
     console.warn("ACCOMPLICE: No API key found. Using simulation mode.");
-    return generateDummyPlan(goal);
+    return generateDummyPlan(goal, style);
   }
 
   try {
@@ -145,18 +148,21 @@ export async function generatePlan(goal, apiKey, style = 'absurd') {
 
   } catch (error) {
     console.error("ACCOMPLICE: Neural Link Failure (API Error)", error);
-    return generateDummyPlan(goal + " [OFFLINE MODE]");
+    return generateDummyPlan(goal + " [OFFLINE MODE]", style);
   }
 }
 
-function generateDummyPlan(goal) {
+function generateDummyPlan(goal, style) {
   const items = [];
+  const isMystic = style === 'monkeys_paw';
+  const verbs = isMystic ? MYSTIC_VERBS : VERBS;
+  const targets = isMystic ? MYSTIC_TARGETS : TARGETS;
 
   // Opening thought
   items.push({
     id: crypto.randomUUID(),
     type: 'thought',
-    text: `Analyzing vector: "${goal.substring(0, 30)}..."`,
+    text: isMystic ? `Consulting the scales of fate for: "${goal.substring(0, 30)}..."` : `Analyzing vector: "${goal.substring(0, 30)}..."`,
     duration: 1500,
     status: 'pending'
   });
@@ -165,7 +171,7 @@ function generateDummyPlan(goal) {
   items.push({
     id: crypto.randomUUID(),
     type: 'planning',
-    text: 'I\'ll need to establish multiple attack vectors here.',
+    text: isMystic ? 'The price must be weighed against the wish.' : 'I\'ll need to establish multiple attack vectors here.',
     duration: 1200,
     status: 'pending'
   });
@@ -177,14 +183,16 @@ function generateDummyPlan(goal) {
       items.push({
         id: crypto.randomUUID(),
         type: 'thought',
-        text: i === 2 ? 'Good progress so far. Time to escalate.' : 'Almost there. Final phase approaching.',
+        text: isMystic
+          ? (i === 2 ? 'The balance shifts. Sacrifice is required.' : 'The thread is spun. The end is woven.')
+          : (i === 2 ? 'Good progress so far. Time to escalate.' : 'Almost there. Final phase approaching.'),
         duration: 1500,
         status: 'pending'
       });
     }
 
-    const verb = VERBS[Math.floor(Math.random() * VERBS.length)];
-    const target = TARGETS[Math.floor(Math.random() * TARGETS.length)];
+    const verb = verbs[Math.floor(Math.random() * verbs.length)];
+    const target = targets[Math.floor(Math.random() * targets.length)];
 
     items.push({
       id: crypto.randomUUID(),
@@ -192,7 +200,11 @@ function generateDummyPlan(goal) {
       text: `${verb} ${target}`,
       duration: 5000,
       status: 'pending',
-      subtasks: [
+      subtasks: isMystic ? [
+        { id: crypto.randomUUID(), text: 'Chanting the ancient script', duration: 2000, status: 'pending' },
+        { id: crypto.randomUUID(), text: 'Extinguishing the ritual candles', duration: 2500, status: 'pending' },
+        { id: crypto.randomUUID(), text: 'Watching the shadows lengthen', duration: 2000, status: 'pending' }
+      ] : [
         { id: crypto.randomUUID(), text: 'Opening browser window', duration: 2000, status: 'pending' },
         { id: crypto.randomUUID(), text: 'Typing authentication script', duration: 2500, status: 'pending' },
         { id: crypto.randomUUID(), text: 'Monitoring progress bar', duration: 2000, status: 'pending' }
@@ -201,10 +213,17 @@ function generateDummyPlan(goal) {
   }
 
   // Final thought
+  let finalMessage = "Mission accomplished. All objectives secured.";
+  if (isMystic) {
+    finalMessage = "The price has been paid. Your wish is granted... in its own way.";
+  } else if (style === 'evil_genius') {
+    finalMessage = "The operation was a success. The world will soon feel the impact.";
+  }
+
   items.push({
     id: crypto.randomUUID(),
     type: 'thought',
-    text: 'Mission accomplished. All objectives secured.',
+    text: finalMessage,
     duration: 1500,
     status: 'pending'
   });
