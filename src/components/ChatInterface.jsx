@@ -62,7 +62,7 @@ const getRandomSuggestions = (style, count = 3) => {
     return selection.sort(() => Math.random() - 0.5);
 };
 
-const ChatInterface = ({ onSend, disabled, settings }) => {
+const ChatInterface = ({ onSend, disabled, settings, isFastForward, onFastForwardToggle }) => {
     const [input, setInput] = useState('');
     const [suggestions, setSuggestions] = useState(() => getRandomSuggestions(settings?.style));
 
@@ -135,15 +135,28 @@ const ChatInterface = ({ onSend, disabled, settings }) => {
                         className="flex-1 bg-transparent resize-none outline-none text-sm input-text"
                         style={{ maxHeight: '200px' }}
                     />
-                    <button
-                        type="submit"
-                        disabled={!input.trim() || disabled}
-                        className="p-2 rounded-lg send-button disabled:opacity-40"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
-                            <path d="M3.478 2.405a.75.75 0 00-.926.94l2.432 7.905H13.5a.75.75 0 010 1.5H4.984l-2.432 7.905a.75.75 0 00.926.94 60.519 60.519 0 0018.445-8.986.75.75 0 000-1.218A60.517 60.517 0 003.478 2.405z" />
-                        </svg>
-                    </button>
+                    <div className="flex items-center gap-1">
+                        <button
+                            type="button"
+                            onClick={onFastForwardToggle}
+                            className={`p-2 rounded-lg transition-all duration-200 ${isFastForward ? 'ff-active' : 'icon-button'}`}
+                            title={isFastForward ? "Disable Fast Forward" : "Fast Forward Task"}
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
+                                <path d="M5.055 7.06c-1.25-.714-2.805.189-2.805 1.628v6.623c0 1.44 1.554 2.342 2.805 1.628l5.808-3.311c1.25-.714 1.25-2.542 0-3.256L5.055 7.06zM12.805 7.06c-1.25-.714-2.805.189-2.805 1.628v6.623c0 1.44 1.554 2.342 2.805 1.628l5.808-3.311c1.25-.714 1.25-2.542 0-3.256L12.805 7.06z" />
+                                <path d="M19.125 7.5a.625.625 0 10-1.25 0v9a.625.625 0 101.25 0v-9z" />
+                            </svg>
+                        </button>
+                        <button
+                            type="submit"
+                            disabled={!input.trim() || disabled}
+                            className="p-2 rounded-lg send-button disabled:opacity-40"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
+                                <path d="M3.478 2.405a.75.75 0 00-.926.94l2.432 7.905H13.5a.75.75 0 010 1.5H4.984l-2.432 7.905a.75.75 0 00.926.94 60.519 60.519 0 0018.445-8.986.75.75 0 000-1.218A60.517 60.517 0 003.478 2.405z" />
+                            </svg>
+                        </button>
+                    </div>
                 </div>
             </form>
             <p className="text-center text-xs mt-3" style={{ color: 'var(--text-dim)' }}>
