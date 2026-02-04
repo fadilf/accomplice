@@ -50,26 +50,20 @@ const ChatInterface = ({ onSend, disabled }) => {
         <div className="max-w-3xl mx-auto">
             {/* Suggested Tasks */}
             {!disabled && (
-                <div className="mb-3 flex flex-wrap items-center gap-2 justify-center">
+                <div className="mb-4 flex flex-wrap items-center gap-2 justify-center">
                     {suggestions.map((suggestion, index) => (
                         <button
                             key={index}
                             onClick={() => handleSuggestionClick(suggestion)}
-                            className="px-3 py-1.5 text-xs rounded-full border transition-all hover:scale-105 hover:border-emerald-500/50"
-                            style={{
-                                backgroundColor: 'rgba(64, 65, 79, 0.6)',
-                                borderColor: 'rgba(86, 88, 105, 0.7)',
-                                color: '#c5c5d2'
-                            }}
+                            className="px-3 py-1.5 text-xs rounded-full chip"
                         >
-                            {suggestion.length > 40 ? suggestion.slice(0, 40) + '...' : suggestion}
+                            {suggestion}
                         </button>
                     ))}
                     <button
                         onClick={refreshSuggestions}
-                        className="p-1.5 rounded-full transition-all hover:bg-white/10"
+                        className="p-1.5 rounded-full icon-button"
                         title="Get new suggestions"
-                        style={{ color: '#8e8ea0' }}
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
@@ -78,13 +72,7 @@ const ChatInterface = ({ onSend, disabled }) => {
                 </div>
             )}
             <form onSubmit={handleSubmit} className="relative">
-                <div
-                    className="flex items-end gap-3 rounded-xl border px-4 py-3 shadow-lg"
-                    style={{
-                        backgroundColor: '#40414f',
-                        borderColor: 'rgba(86,88,105,0.7)'
-                    }}
-                >
+                <div className="flex items-end gap-3 rounded-2xl px-4 py-3 input-shell">
                     <textarea
                         value={input}
                         onChange={(e) => {
@@ -102,20 +90,13 @@ const ChatInterface = ({ onSend, disabled }) => {
                         disabled={disabled}
                         placeholder={disabled ? "Waiting for response..." : "Send a message..."}
                         rows={1}
-                        className="flex-1 bg-transparent resize-none outline-none text-sm"
-                        style={{
-                            color: '#ececf1',
-                            maxHeight: '200px'
-                        }}
+                        className="flex-1 bg-transparent resize-none outline-none text-sm input-text"
+                        style={{ maxHeight: '200px' }}
                     />
                     <button
                         type="submit"
                         disabled={!input.trim() || disabled}
-                        className="p-2 rounded-lg transition-all disabled:opacity-30"
-                        style={{
-                            backgroundColor: input.trim() && !disabled ? '#10a37f' : 'transparent',
-                            color: input.trim() && !disabled ? 'white' : '#8e8ea0'
-                        }}
+                        className="p-2 rounded-lg send-button disabled:opacity-40"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
                             <path d="M3.478 2.405a.75.75 0 00-.926.94l2.432 7.905H13.5a.75.75 0 010 1.5H4.984l-2.432 7.905a.75.75 0 00.926.94 60.519 60.519 0 0018.445-8.986.75.75 0 000-1.218A60.517 60.517 0 003.478 2.405z" />
@@ -123,7 +104,7 @@ const ChatInterface = ({ onSend, disabled }) => {
                     </button>
                 </div>
             </form>
-            <p className="text-center text-xs mt-2" style={{ color: '#8e8ea0' }}>
+            <p className="text-center text-xs mt-3" style={{ color: 'var(--text-dim)' }}>
                 Accomplice may produce inaccurate information about people, places, or facts.
             </p>
         </div>

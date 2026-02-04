@@ -1,24 +1,31 @@
 @import "tailwindcss";
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap");
 
 :root {
-  --bg-main: #343541;
-  --bg-sidebar: #202123;
-  --bg-message-user: #343541;
-  --bg-message-assistant: #444654;
-  --text-primary: #ececf1;
-  --text-secondary: #c5c5d2;
-  --text-dim: #8e8ea0;
-  --border-color: #565869;
-  --accent-primary: #10a37f;
-  --accent-hover: #1a7f64;
-  --font-ui: 'Söhne', 'ui-sans-serif', 'system-ui', -apple-system, 'Segoe UI', Roboto, Ubuntu, Cantarell, 'Noto Sans', sans-serif;
-  --font-mono: 'Söhne Mono', 'Monaco', 'Andale Mono', 'Ubuntu Mono', monospace;
+  --bg-main: #0f131a;
+  --bg-panel: #151a24;
+  --bg-elevated: #1b2230;
+  --bg-soft: rgba(20, 26, 36, 0.72);
+  --text-primary: #f4f6fb;
+  --text-secondary: #c7cfdd;
+  --text-dim: #93a0b4;
+  --border-color: rgba(148, 163, 184, 0.26);
+  --accent-primary: #4dd4b5;
+  --accent-strong: #1fc7a1;
+  --accent-warm: #f59e0b;
+  --font-ui: "DM Sans", "Segoe UI", "Helvetica Neue", "Noto Sans", sans-serif;
+  --font-display: "Space Grotesk", "DM Sans", "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", "SFMono-Regular", "Menlo", monospace;
 }
 
 body {
   margin: 0;
   padding: 0;
   background-color: var(--bg-main);
+  background-image:
+    radial-gradient(1200px circle at 12% -10%, rgba(77, 212, 181, 0.18), transparent 60%),
+    radial-gradient(900px circle at 88% -20%, rgba(248, 113, 113, 0.14), transparent 55%),
+    linear-gradient(180deg, #0f131a 0%, #0c1016 100%);
   color: var(--text-primary);
   font-family: var(--font-ui);
   height: 100vh;
@@ -43,12 +50,12 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(217, 217, 227, 0.2);
+  background: rgba(148, 163, 184, 0.28);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(217, 217, 227, 0.4);
+  background: rgba(148, 163, 184, 0.45);
 }
 
 /* Utility classes */
@@ -58,6 +65,144 @@ body {
 
 .text-dim {
   color: var(--text-dim);
+}
+
+.font-display {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+}
+
+.app-shell {
+  background: linear-gradient(180deg, rgba(15, 19, 26, 0.75), rgba(15, 19, 26, 0.95));
+}
+
+.app-header {
+  background: rgba(15, 19, 26, 0.7);
+  border-bottom: 1px solid var(--border-color);
+  backdrop-filter: blur(14px);
+}
+
+.surface {
+  background: var(--bg-soft);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 18px 40px rgba(9, 12, 17, 0.55), 0 2px 8px rgba(9, 12, 17, 0.35);
+}
+
+.message-card {
+  border-radius: 18px;
+  border: 1px solid var(--border-color);
+  background: rgba(17, 22, 30, 0.8);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
+}
+
+.message-user {
+  background: rgba(14, 19, 27, 0.75);
+}
+
+.message-agent {
+  background: rgba(22, 29, 40, 0.78);
+}
+
+.avatar-user {
+  background: linear-gradient(135deg, #64748b, #94a3b8);
+  color: #0b1016;
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.4);
+}
+
+.avatar-agent {
+  background: linear-gradient(135deg, #1fc7a1, #4dd4b5);
+  box-shadow: 0 12px 24px rgba(77, 212, 181, 0.35);
+}
+
+.hero-title {
+  color: var(--text-primary);
+  font-size: clamp(1.6rem, 1.1rem + 1.5vw, 2.4rem);
+}
+
+.hero-subtitle {
+  color: var(--text-dim);
+}
+
+.logo-mark {
+  filter: drop-shadow(0 12px 24px rgba(77, 212, 181, 0.25));
+}
+
+.chip {
+  background: rgba(18, 24, 33, 0.75);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  color: var(--text-secondary);
+  transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.chip:hover {
+  background: rgba(24, 34, 48, 0.75);
+  border-color: rgba(77, 212, 181, 0.6);
+  transform: translateY(-1px) scale(1.02);
+}
+
+.icon-button {
+  color: var(--text-dim);
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.icon-button:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.input-shell {
+  background: rgba(16, 21, 30, 0.9);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  box-shadow: 0 20px 45px rgba(10, 15, 22, 0.5);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.input-shell:focus-within {
+  border-color: rgba(77, 212, 181, 0.6);
+  box-shadow: 0 20px 45px rgba(10, 15, 22, 0.5), 0 0 0 3px rgba(77, 212, 181, 0.12);
+}
+
+.input-text {
+  color: var(--text-primary);
+}
+
+.send-button {
+  color: var(--text-dim);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
+}
+
+.send-button:not(:disabled) {
+  color: #0b1016;
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-strong));
+  box-shadow: 0 10px 20px rgba(31, 199, 161, 0.35);
+}
+
+.send-button:not(:disabled):hover {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 28px rgba(31, 199, 161, 0.4);
+}
+
+.dialog-surface {
+  background: rgba(18, 24, 34, 0.95);
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  box-shadow: 0 30px 70px rgba(7, 10, 16, 0.7);
+}
+
+.settings-option {
+  background: rgba(21, 28, 40, 0.7);
+  border: 1px solid transparent;
+  transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+}
+
+.settings-option:hover {
+  background: rgba(25, 34, 48, 0.85);
+  transform: translateY(-1px);
+}
+
+.settings-option.is-active {
+  border-color: rgba(77, 212, 181, 0.6);
+  background: rgba(20, 34, 44, 0.9);
+  box-shadow: inset 0 0 0 1px rgba(77, 212, 181, 0.25);
 }
 
 /* Smooth fade-in animation */
