@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 const REGULAR_TASKS = [
     "Help me write a heartfelt apology to my houseplant for forgetting to water it",
@@ -64,6 +64,7 @@ const getRandomSuggestions = (style, count = 3) => {
 
 const ChatInterface = ({ onSend, disabled, settings, isFastForward, onFastForwardToggle }) => {
     const [input, setInput] = useState('');
+    const textareaRef = useRef(null);
     const [suggestions, setSuggestions] = useState(() => getRandomSuggestions(settings?.style));
 
     useEffect(() => {
@@ -85,6 +86,10 @@ const ChatInterface = ({ onSend, disabled, settings, isFastForward, onFastForwar
         if (input.trim() && !disabled) {
             onSend(input);
             setInput('');
+            // Reset height
+            if (textareaRef.current) {
+                textareaRef.current.style.height = 'auto';
+            }
         }
     };
 
@@ -114,14 +119,16 @@ const ChatInterface = ({ onSend, disabled, settings, isFastForward, onFastForwar
                 </div>
             )}
             <form onSubmit={handleSubmit} className="relative">
-                <div className="flex items-end gap-3 rounded-2xl px-4 py-3 input-shell">
+                <div className="flex items-center gap-3 rounded-2xl px-4 py-3 input-shell">
                     <textarea
+                        ref={textareaRef}
                         value={input}
                         onChange={(e) => {
                             setInput(e.target.value);
                             // Auto-resize textarea
                             e.target.style.height = 'auto';
-                            e.target.style.height = Math.min(e.target.scrollHeight, 200) + 'px';
+                            const newHeight = Math.min(e.target.scrollHeight, 200);
+                            e.target.style.height = `${newHeight}px`;
                         }}
                         onKeyDown={(e) => {
                             if (e.key === 'Enter' && !e.shiftKey) {
@@ -133,7 +140,7 @@ const ChatInterface = ({ onSend, disabled, settings, isFastForward, onFastForwar
                         placeholder={disabled ? "Waiting for response..." : "Send a message..."}
                         rows={1}
                         className="flex-1 bg-transparent resize-none outline-none text-sm input-text"
-                        style={{ maxHeight: '200px' }}
+                        style={{ height: 'auto', maxHeight: '200px' }}
                     />
                     <div className="flex items-center gap-1">
                         <button

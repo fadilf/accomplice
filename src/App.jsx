@@ -8,7 +8,19 @@ function App() {
   const [messages, setMessages] = useState([]);
   const [currentPlan, setCurrentPlan] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [settings, setSettings] = useState({ style: 'evil_genius', speed: 1 });
+  const [settings, setSettings] = useState(() => {
+    const saved = localStorage.getItem('accomplice_settings');
+    try {
+      return saved ? JSON.parse(saved) : { style: 'evil_genius', speed: 1 };
+    } catch (e) {
+      console.error('Failed to parse settings from localStorage', e);
+      return { style: 'evil_genius', speed: 1 };
+    }
+  });
+
+  useEffect(() => {
+    localStorage.setItem('accomplice_settings', JSON.stringify(settings));
+  }, [settings]);
   const [isFastForward, setIsFastForward] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const messagesEndRef = useRef(null);
