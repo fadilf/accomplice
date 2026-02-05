@@ -6,27 +6,44 @@ const AgentResponse = ({ plan, onComplete, speed = 1, style }) => {
     const [currentItemIndex, setCurrentItemIndex] = useState(0);
     const [currentSubtaskIndex, setCurrentSubtaskIndex] = useState(-1);
     const bottomRef = useRef(null);
+    const [prevPlan, setPrevPlan] = useState(null);
+    const onCompleteRef = useRef(onComplete);
 
+    // Keep onComplete ref current
     useEffect(() => {
-        if (plan) {
-            setItems(plan);
-            setStage('thinking');
+        onCompleteRef.current = onComplete;
+    });
 
-            // Brief thinking delay before starting
-            setTimeout(() => {
+    // Reset state when plan changes (render-time state sync)
+    if (plan && plan !== prevPlan) {
+        setPrevPlan(plan);
+        setItems(plan);
+        setStage('thinking');
+        setCurrentItemIndex(0);
+        setCurrentSubtaskIndex(-1);
+    }
+
+    // Thinking delay before executing
+    useEffect(() => {
+        if (stage === 'thinking' && items.length > 0) {
+            const timer = setTimeout(() => {
                 setStage('executing');
             }, 1500 / speed);
+            return () => clearTimeout(timer);
         }
-    }, [plan]);
+    }, [stage, items.length, speed]);
+
+    // Handle completion
+    useEffect(() => {
+        if (stage === 'executing' && items.length > 0 && currentItemIndex >= items.length) {
+            setStage('done');
+            onCompleteRef.current?.();
+        }
+    }, [stage, currentItemIndex, items.length]);
 
     useEffect(() => {
         if (stage !== 'executing') return;
-
-        if (currentItemIndex >= items.length) {
-            setStage('done');
-            if (onComplete) onComplete();
-            return;
-        }
+        if (currentItemIndex >= items.length) return;
 
         const currentItem = items[currentItemIndex];
 
@@ -34,8 +51,8 @@ const AgentResponse = ({ plan, onComplete, speed = 1, style }) => {
         if (currentItem.type === 'thought' || currentItem.type === 'planning') {
             // Mark as active
             setItems(prev => {
+                if (prev[currentItemIndex]?.status === 'active') return prev;
                 const newItems = [...prev];
-                if (newItems[currentItemIndex].status === 'active') return newItems;
                 newItems[currentItemIndex] = { ...newItems[currentItemIndex], status: 'active' };
                 return newItems;
             });
@@ -64,9 +81,9 @@ const AgentResponse = ({ plan, onComplete, speed = 1, style }) => {
 
                 // Mark subtask active
                 setItems(prev => {
+                    if (prev[currentItemIndex]?.subtasks?.[currentSubtaskIndex]?.status === 'active') return prev;
                     const newItems = [...prev];
                     const activeSubs = [...newItems[currentItemIndex].subtasks];
-                    if (activeSubs[currentSubtaskIndex].status === 'active') return newItems;
                     activeSubs[currentSubtaskIndex] = { ...activeSubs[currentSubtaskIndex], status: 'active' };
                     newItems[currentItemIndex] = { ...newItems[currentItemIndex], subtasks: activeSubs };
                     return newItems;
@@ -104,8 +121,8 @@ const AgentResponse = ({ plan, onComplete, speed = 1, style }) => {
             else if (currentSubtaskIndex === -1) {
                 // Activate Task
                 setItems(prev => {
+                    if (prev[currentItemIndex]?.status === 'active') return prev;
                     const newItems = [...prev];
-                    if (newItems[currentItemIndex].status === 'active') return newItems;
                     newItems[currentItemIndex] = { ...newItems[currentItemIndex], status: 'active' };
                     return newItems;
                 });
@@ -128,6 +145,7 @@ const AgentResponse = ({ plan, onComplete, speed = 1, style }) => {
             }
         }
 
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [stage, currentItemIndex, currentSubtaskIndex, items.length, speed]);
 
     // Unified scroll effect that is less aggressive
@@ -149,9 +167,9 @@ const AgentResponse = ({ plan, onComplete, speed = 1, style }) => {
             <div className="flex flex-col gap-3 text-sm" style={{ color: 'var(--text-primary)' }}>
                 <div className="flex items-center gap-2 fade-in">
                     <div className="flex gap-1">
-                        <span className="w-2 h-2 rounded-full gentle-pulse" style={{ backgroundColor: style === 'monkeys_paw' ? '#a855f7' : style === 'incompetent' ? '#ef4444' : 'var(--accent-primary)' }}></span>
-                        <span className="w-2 h-2 rounded-full gentle-pulse" style={{ backgroundColor: style === 'monkeys_paw' ? '#a855f7' : style === 'incompetent' ? '#ef4444' : 'var(--accent-primary)', animationDelay: '0.2s' }}></span>
-                        <span className="w-2 h-2 rounded-full gentle-pulse" style={{ backgroundColor: style === 'monkeys_paw' ? '#a855f7' : style === 'incompetent' ? '#ef4444' : 'var(--accent-primary)', animationDelay: '0.4s' }}></span>
+                        <span className="w-2 h-2 rounded-full gentle-pulse" style={{ backgroundColor: 'var(--active-accent)' }}></span>
+                        <span className="w-2 h-2 rounded-full gentle-pulse" style={{ backgroundColor: 'var(--active-accent)', animationDelay: '0.2s' }}></span>
+                        <span className="w-2 h-2 rounded-full gentle-pulse" style={{ backgroundColor: 'var(--active-accent)', animationDelay: '0.4s' }}></span>
                     </div>
                     <span style={{ color: 'var(--text-dim)' }}>{style === 'monkeys_paw' ? 'Communing with the void...' : style === 'incompetent' ? 'Uh... thinking... kind of...' : 'Thinking...'}</span>
                 </div>
@@ -165,13 +183,13 @@ const AgentResponse = ({ plan, onComplete, speed = 1, style }) => {
 
         if (status === 'done') {
             return (
-                <svg className={sizeClass} style={{ color: 'var(--accent-primary)' }} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <svg className={sizeClass} style={{ color: 'var(--active-accent)' }} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
                     <path fillRule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clipRule="evenodd" />
                 </svg>
             );
         } else if (status === 'active') {
             return (
-                <svg className={`${sizeClass} spinner`} style={{ color: 'var(--accent-primary)' }} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <svg className={`${sizeClass} spinner`} style={{ color: 'var(--active-accent)' }} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
@@ -248,9 +266,9 @@ const AgentResponse = ({ plan, onComplete, speed = 1, style }) => {
             {stage === 'thinking' && (
                 <div className="flex items-center gap-2 fade-in">
                     <div className="flex gap-1">
-                        <span className="w-2 h-2 rounded-full gentle-pulse" style={{ backgroundColor: style === 'monkeys_paw' ? '#a855f7' : style === 'incompetent' ? '#ef4444' : 'var(--accent-primary)' }}></span>
-                        <span className="w-2 h-2 rounded-full gentle-pulse" style={{ backgroundColor: style === 'monkeys_paw' ? '#a855f7' : style === 'incompetent' ? '#ef4444' : 'var(--accent-primary)', animationDelay: '0.2s' }}></span>
-                        <span className="w-2 h-2 rounded-full gentle-pulse" style={{ backgroundColor: style === 'monkeys_paw' ? '#a855f7' : style === 'incompetent' ? '#ef4444' : 'var(--accent-primary)', animationDelay: '0.4s' }}></span>
+                        <span className="w-2 h-2 rounded-full gentle-pulse" style={{ backgroundColor: 'var(--active-accent)' }}></span>
+                        <span className="w-2 h-2 rounded-full gentle-pulse" style={{ backgroundColor: 'var(--active-accent)', animationDelay: '0.2s' }}></span>
+                        <span className="w-2 h-2 rounded-full gentle-pulse" style={{ backgroundColor: 'var(--active-accent)', animationDelay: '0.4s' }}></span>
                     </div>
                     <span style={{ color: 'var(--text-dim)' }}>{style === 'monkeys_paw' ? 'Communing with the void...' : style === 'incompetent' ? 'Uh... thinking... kind of...' : 'Thinking...'}</span>
                 </div>
@@ -279,24 +297,31 @@ const AgentResponse = ({ plan, onComplete, speed = 1, style }) => {
                 <div className="mt-4 pt-4 border-t flex items-center gap-2 fade-in" style={{ borderColor: 'var(--border-color)' }}>
                     {style === 'monkeys_paw' ? (
                         <>
-                            <svg className="w-5 h-5 text-purple-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <svg className="w-5 h-5 completion-badge-mystic" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
                                 <path d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM12.75 6a.75.75 0 00-1.5 0v6c0 .414.336.75.75.75h4.5a.75.75 0 000-1.5h-3.75V6z" />
                             </svg>
-                            <span className="font-medium text-purple-500 italic">The wish is fulfilled. Fear the consequences.</span>
+                            <span className="font-medium completion-badge-mystic italic">The wish is fulfilled. Fear the consequences.</span>
                         </>
                     ) : style === 'incompetent' ? (
                         <>
-                            <svg className="w-5 h-5 text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <svg className="w-5 h-5 completion-badge-incompetent" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
                                 <path fillRule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm-1.72 6.97a.75.75 0 10-1.06 1.06L10.94 12l-1.72 1.72a.75.75 0 101.06 1.06L12 13.06l1.72 1.72a.75.75 0 101.06-1.06L13.06 12l1.72-1.72a.75.75 0 10-1.06-1.06L12 10.94l-1.72-1.72z" clipRule="evenodd" />
                             </svg>
-                            <span className="font-medium text-red-500">Task failed. I'm so sorry. I tried my best.</span>
+                            <span className="font-medium completion-badge-incompetent">Task failed. I'm so sorry. I tried my best.</span>
+                        </>
+                    ) : style === 'evil_genius' ? (
+                        <>
+                            <svg className="w-5 h-5 completion-badge-evil" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                <path fillRule="evenodd" d="M8.603 3.799A4.49 4.49 0 0112 2.25c1.357 0 2.573.6 3.397 1.549a4.49 4.49 0 013.498 1.307 4.491 4.491 0 011.307 3.497A4.49 4.49 0 0121.75 12a4.49 4.49 0 01-1.549 3.397 4.491 4.491 0 01-1.307 3.497 4.491 4.491 0 01-3.497 1.307A4.49 4.49 0 0112 21.75a4.49 4.49 0 01-3.397-1.549 4.49 4.49 0 01-3.498-1.306 4.491 4.491 0 01-1.307-3.498A4.49 4.49 0 012.25 12c0-1.357.6-2.573 1.549-3.397a4.49 4.49 0 011.307-3.497 4.49 4.49 0 013.497-1.307zm7.007 6.387a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clipRule="evenodd" />
+                            </svg>
+                            <span className="font-medium completion-badge-evil">Mission accomplished. No witnesses.</span>
                         </>
                     ) : (
                         <>
-                            <svg className="w-5 h-5" style={{ color: 'var(--accent-primary)' }} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <svg className="w-5 h-5 completion-badge" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
                                 <path fillRule="evenodd" d="M8.603 3.799A4.49 4.49 0 0112 2.25c1.357 0 2.573.6 3.397 1.549a4.49 4.49 0 013.498 1.307 4.491 4.491 0 011.307 3.497A4.49 4.49 0 0121.75 12a4.49 4.49 0 01-1.549 3.397 4.491 4.491 0 01-1.307 3.497 4.491 4.491 0 01-3.497 1.307A4.49 4.49 0 0112 21.75a4.49 4.49 0 01-3.397-1.549 4.49 4.49 0 01-3.498-1.306 4.491 4.491 0 01-1.307-3.498A4.49 4.49 0 012.25 12c0-1.357.6-2.573 1.549-3.397a4.49 4.49 0 011.307-3.497 4.49 4.49 0 013.497-1.307zm7.007 6.387a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clipRule="evenodd" />
                             </svg>
-                            <span style={{ color: 'var(--accent-primary)' }} className="font-medium">Task completed successfully</span>
+                            <span className="font-medium completion-badge">Task completed successfully</span>
                         </>
                     )}
                 </div>

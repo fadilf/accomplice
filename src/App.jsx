@@ -79,13 +79,13 @@ function App() {
   const currentStyleIcon = STYLES.find(s => s.id === settings.style)?.icon || '⚙️';
 
   return (
-    <div className="h-screen flex flex-col app-shell">
+    <div className={`h-screen flex flex-col app-shell style-${settings.style}`}>
       {/* Header */}
       <header className="flex items-center justify-between px-4 py-3 app-header">
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
-            <div className={`w-2 h-2 rounded-full ${isProcessing ? 'bg-emerald-500 gentle-pulse' : 'bg-gray-500'}`}></div>
-            <h1 className="text-base font-semibold font-display" style={{ color: 'var(--text-primary)' }}>Accomplice</h1>
+            <div className={`w-2 h-2 rounded-full ${isProcessing ? 'gentle-pulse' : 'bg-gray-500'}`} style={{ backgroundColor: isProcessing ? 'var(--active-accent)' : undefined }}></div>
+            <h1 className="text-base font-semibold font-display header-title">Accomplice</h1>
           </div>
         </div>
         <div className="relative">
