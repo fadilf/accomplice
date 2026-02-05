@@ -143,7 +143,21 @@ const AgentResponse = ({ plan, onComplete, speed = 1, style }) => {
         }
     }, [items, stage, currentItemIndex, currentSubtaskIndex]);
 
-    if (!plan) return null;
+    // Show loading state while waiting for plan
+    if (!plan) {
+        return (
+            <div className="flex flex-col gap-3 text-sm" style={{ color: 'var(--text-primary)' }}>
+                <div className="flex items-center gap-2 fade-in">
+                    <div className="flex gap-1">
+                        <span className="w-2 h-2 rounded-full gentle-pulse" style={{ backgroundColor: style === 'monkeys_paw' ? '#a855f7' : style === 'incompetent' ? '#ef4444' : 'var(--accent-primary)' }}></span>
+                        <span className="w-2 h-2 rounded-full gentle-pulse" style={{ backgroundColor: style === 'monkeys_paw' ? '#a855f7' : style === 'incompetent' ? '#ef4444' : 'var(--accent-primary)', animationDelay: '0.2s' }}></span>
+                        <span className="w-2 h-2 rounded-full gentle-pulse" style={{ backgroundColor: style === 'monkeys_paw' ? '#a855f7' : style === 'incompetent' ? '#ef4444' : 'var(--accent-primary)', animationDelay: '0.4s' }}></span>
+                    </div>
+                    <span style={{ color: 'var(--text-dim)' }}>{style === 'monkeys_paw' ? 'Communing with the void...' : style === 'incompetent' ? 'Uh... thinking... kind of...' : 'Thinking...'}</span>
+                </div>
+            </div>
+        );
+    }
 
     // Render icons
     const renderStatusIcon = (status, size = 'normal') => {
