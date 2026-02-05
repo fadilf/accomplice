@@ -36,27 +36,30 @@ function App() {
   const handleSend = async (text) => {
     // Add user message
     const userMsg = { id: Date.now(), role: 'user', content: text };
-    setMessages(prev => [...prev, userMsg]);
+    const agentMsgId = Date.now() + 1;
 
+    // Add agent message immediately with null plan to show thinking state
+    const agentMsg = {
+      id: agentMsgId,
+      role: 'agent',
+      plan: null,
+      style: settings.style,
+      fastForward: isFastForward
+    };
+
+    setMessages(prev => [...prev, userMsg, agentMsg]);
     setIsProcessing(true);
 
-    // Simulate initial delay
-    setTimeout(async () => {
+    // Generate the plan
+    const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+    const plan = await generatePlan(text, apiKey, settings.style);
 
-      const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-      const plan = await generatePlan(text, apiKey, settings.style);
+    setCurrentPlan(plan);
 
-      setCurrentPlan(plan);
-
-      const agentMsg = {
-        id: Date.now() + 1,
-        role: 'agent',
-        plan: plan,
-        style: settings.style,
-        fastForward: isFastForward // Capture current FF state for this message
-      };
-      setMessages(prev => [...prev, agentMsg]);
-    }, 800);
+    // Update the agent message with the plan
+    setMessages(prev => prev.map(msg =>
+      msg.id === agentMsgId ? { ...msg, plan } : msg
+    ));
   };
 
   const handleCompletion = () => {
