@@ -177,25 +177,16 @@ const AgentResponse = ({ plan, onComplete, speed = 1, style }) => {
         );
     }
 
-    // Render icons
+    // Render icons - Aqua skeuomorphic checkboxes
     const renderStatusIcon = (status, size = 'normal') => {
-        const sizeClass = size === 'small' ? 'w-4 h-4' : 'w-5 h-5';
+        const sizeClass = size === 'small' ? 'aqua-checkbox-sm' : 'aqua-checkbox-md';
 
         if (status === 'done') {
-            return (
-                <svg className={sizeClass} style={{ color: 'var(--active-accent)' }} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                    <path fillRule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clipRule="evenodd" />
-                </svg>
-            );
+            return <div className={`aqua-checkbox ${sizeClass} aqua-checkbox-checked shrink-0`} />;
         } else if (status === 'active') {
-            return (
-                <svg className={`${sizeClass} spinner`} style={{ color: 'var(--active-accent)' }} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-            );
+            return <div className={`aqua-checkbox ${sizeClass} aqua-checkbox-active shrink-0`} />;
         } else {
-            return <div className={`${sizeClass} rounded-full border-2`} style={{ borderColor: 'var(--border-color)' }}></div>;
+            return <div className={`aqua-checkbox ${sizeClass} shrink-0`} />;
         }
     };
 
@@ -288,7 +279,6 @@ const AgentResponse = ({ plan, onComplete, speed = 1, style }) => {
                         // Fallback for legacy format (no type)
                         return renderTask({ ...item, type: 'task' });
                     })}
-                    <div ref={bottomRef} />
                 </div>
             )}
 
@@ -326,6 +316,9 @@ const AgentResponse = ({ plan, onComplete, speed = 1, style }) => {
                     )}
                 </div>
             )}
+
+            {/* Scroll anchor - must be after completion badge */}
+            <div ref={bottomRef} />
         </div>
     );
 };
