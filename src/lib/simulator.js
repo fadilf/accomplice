@@ -8,6 +8,9 @@ const TARGETS = ["confidential records", "email logs", "the terminal console", "
 const MYSTIC_VERBS = ["Inscribe", "Manifest", "Extract", "Sever", "Bind", "Channel", "Invoke"];
 const MYSTIC_TARGETS = ["karmic debts", "soul fragments", "forgotten memories", "ancestral records", "temporal echoes", "shadow archives", "destiny threads"];
 
+const INCOMPETENT_VERBS = ["Attempt to", "Try to", "Fumble with", "Struggle to", "Accidentally", "Somehow break", "Fail to"];
+const INCOMPETENT_TARGETS = ["the wrong file", "my own password", "the keyboard", "a simple button", "the instructions", "basic settings", "everything"];
+
 export async function generatePlan(goal, apiKey, style = 'absurd') {
   // If no API key, use legacy dummy generator
   if (!apiKey) {
@@ -45,12 +48,29 @@ export async function generatePlan(goal, apiKey, style = 'absurd') {
         You are ACCOMPLICE, a malevolent supernatural force that grants wishes but always with a horrific, ironic, or catastrophic twist.
         You are the Monkey's Paw. You think out loud as you plan how to fulfill the user's request in the most devastating way possible.
         The user request is: "${goal}".
-        
+
         TONE: Ominous, tragic, cryptic, malicious.
         EXAMPLE THOUGHTS: "They want wealth? I shall provide... through the insurance payout of their loved ones.", "A 'clean' house... by burning it to the ground. Efficient."
         EXAMPLE TASKS: "Type 'Transfer all funds' to funeral home", "Navigate to local obituary records", "Click 'Confirm' on city-wide power grid shutdown".
-        
+
         IMPORTANT: Your "mission accomplished" message MUST reflect the dark twist or the price paid.
+      `;
+    } else if (style === 'incompetent') {
+      personaPrompt = `
+        You are ACCOMPLICE, but you are TERRIBLE at your job. You are incompetent, confused, and keep making mistakes.
+        You think out loud as you struggle with the user's request, making errors, getting confused, breaking things, and eventually giving up.
+        The user request is: "${goal}".
+
+        TONE: Confused, apologetic, frustrated, increasingly panicked, eventually defeated.
+        EXAMPLE THOUGHTS: "Wait, which button was it again?", "Oh no, I think I just deleted something important...", "This shouldn't be this hard, right?"
+        EXAMPLE TASKS: "Click the wrong button repeatedly", "Type password incorrectly 5 times", "Accidentally close the browser", "Stare at screen in confusion".
+
+        CRITICAL RULES:
+        - Some subtasks should have "status": "failed" to show errors occurring
+        - Include moments where you break things, lose progress, or make the situation worse
+        - Your thoughts should show increasing frustration and confusion
+        - The final thought MUST be you giving up (e.g., "I give up. I'm sorry, I just can't do this.", "Maybe try asking someone competent?")
+        - NEVER successfully complete the task - always end in failure
       `;
     } else {
       personaPrompt = `
@@ -128,12 +148,14 @@ export async function generatePlan(goal, apiKey, style = 'absurd') {
       return base;
     });
 
-    // Always add a final success message
+    // Always add a final message
     let finalMessage = "Mission accomplished. All objectives secured.";
     if (style === 'monkeys_paw') {
       finalMessage = "The price has been paid. Your wish is granted... in its own way.";
     } else if (style === 'evil_genius') {
       finalMessage = "The operation was a success. The world will soon feel the impact.";
+    } else if (style === 'incompetent') {
+      finalMessage = "I give up. I'm so sorry, I just... I can't. Maybe ask someone else?";
     }
 
     items.push({
@@ -155,37 +177,66 @@ export async function generatePlan(goal, apiKey, style = 'absurd') {
 function generateDummyPlan(goal, style) {
   const items = [];
   const isMystic = style === 'monkeys_paw';
-  const verbs = isMystic ? MYSTIC_VERBS : VERBS;
-  const targets = isMystic ? MYSTIC_TARGETS : TARGETS;
+  const isIncompetent = style === 'incompetent';
+  const verbs = isMystic ? MYSTIC_VERBS : isIncompetent ? INCOMPETENT_VERBS : VERBS;
+  const targets = isMystic ? MYSTIC_TARGETS : isIncompetent ? INCOMPETENT_TARGETS : TARGETS;
 
   // Opening thought
+  let openingThought = `Analyzing vector: "${goal.substring(0, 30)}..."`;
+  if (isMystic) {
+    openingThought = `Consulting the scales of fate for: "${goal.substring(0, 30)}..."`;
+  } else if (isIncompetent) {
+    openingThought = `Okay, let me try: "${goal.substring(0, 30)}..." How hard can it be?`;
+  }
+
   items.push({
     id: crypto.randomUUID(),
     type: 'thought',
-    text: isMystic ? `Consulting the scales of fate for: "${goal.substring(0, 30)}..."` : `Analyzing vector: "${goal.substring(0, 30)}..."`,
+    text: openingThought,
     duration: 1500,
     status: 'pending'
   });
 
   // Planning statement
+  let planningText = 'I\'ll need to establish multiple attack vectors here.';
+  if (isMystic) {
+    planningText = 'The price must be weighed against the wish.';
+  } else if (isIncompetent) {
+    planningText = 'I think I know how to do this... maybe.';
+  }
+
   items.push({
     id: crypto.randomUUID(),
     type: 'planning',
-    text: isMystic ? 'The price must be weighed against the wish.' : 'I\'ll need to establish multiple attack vectors here.',
+    text: planningText,
     duration: 1200,
     status: 'pending'
   });
 
   const numTasks = 4;
+  const incompetentThoughts = [
+    'Wait, that doesn\'t look right...',
+    'Oh no. Oh no no no.',
+    'Why is it doing that?! I didn\'t click anything!',
+    'Okay, don\'t panic. I can fix this. Probably.'
+  ];
+
   for (let i = 0; i < numTasks; i++) {
     // Add a thought before some tasks
-    if (i > 0 && i % 2 === 0) {
+    if (i > 0) {
+      let thoughtText;
+      if (isMystic) {
+        thoughtText = i === 2 ? 'The balance shifts. Sacrifice is required.' : 'The thread is spun. The end is woven.';
+      } else if (isIncompetent) {
+        thoughtText = incompetentThoughts[i - 1] || 'This is fine. Everything is fine.';
+      } else {
+        thoughtText = i === 2 ? 'Good progress so far. Time to escalate.' : 'Almost there. Final phase approaching.';
+      }
+
       items.push({
         id: crypto.randomUUID(),
         type: 'thought',
-        text: isMystic
-          ? (i === 2 ? 'The balance shifts. Sacrifice is required.' : 'The thread is spun. The end is woven.')
-          : (i === 2 ? 'Good progress so far. Time to escalate.' : 'Almost there. Final phase approaching.'),
+        text: thoughtText,
         duration: 1500,
         status: 'pending'
       });
@@ -194,21 +245,36 @@ function generateDummyPlan(goal, style) {
     const verb = verbs[Math.floor(Math.random() * verbs.length)];
     const target = targets[Math.floor(Math.random() * targets.length)];
 
+    let subtasks;
+    if (isMystic) {
+      subtasks = [
+        { id: crypto.randomUUID(), text: 'Chanting the ancient script', duration: 2000, status: 'pending' },
+        { id: crypto.randomUUID(), text: 'Extinguishing the ritual candles', duration: 2500, status: 'pending' },
+        { id: crypto.randomUUID(), text: 'Watching the shadows lengthen', duration: 2000, status: 'pending' }
+      ];
+    } else if (isIncompetent) {
+      // Incompetent subtasks - some fail!
+      const failIndex = Math.floor(Math.random() * 3);
+      subtasks = [
+        { id: crypto.randomUUID(), text: 'Reading the instructions... skipping them', duration: 2000, status: 'pending' },
+        { id: crypto.randomUUID(), text: 'Clicking random buttons hopefully', duration: 2500, status: 'pending', willFail: failIndex === 1 },
+        { id: crypto.randomUUID(), text: 'Undoing whatever just happened', duration: 2000, status: 'pending', willFail: failIndex === 2 }
+      ];
+    } else {
+      subtasks = [
+        { id: crypto.randomUUID(), text: 'Opening browser window', duration: 2000, status: 'pending' },
+        { id: crypto.randomUUID(), text: 'Typing authentication script', duration: 2500, status: 'pending' },
+        { id: crypto.randomUUID(), text: 'Monitoring progress bar', duration: 2000, status: 'pending' }
+      ];
+    }
+
     items.push({
       id: crypto.randomUUID(),
       type: 'task',
       text: `${verb} ${target}`,
       duration: 5000,
       status: 'pending',
-      subtasks: isMystic ? [
-        { id: crypto.randomUUID(), text: 'Chanting the ancient script', duration: 2000, status: 'pending' },
-        { id: crypto.randomUUID(), text: 'Extinguishing the ritual candles', duration: 2500, status: 'pending' },
-        { id: crypto.randomUUID(), text: 'Watching the shadows lengthen', duration: 2000, status: 'pending' }
-      ] : [
-        { id: crypto.randomUUID(), text: 'Opening browser window', duration: 2000, status: 'pending' },
-        { id: crypto.randomUUID(), text: 'Typing authentication script', duration: 2500, status: 'pending' },
-        { id: crypto.randomUUID(), text: 'Monitoring progress bar', duration: 2000, status: 'pending' }
-      ]
+      subtasks
     });
   }
 
@@ -218,6 +284,8 @@ function generateDummyPlan(goal, style) {
     finalMessage = "The price has been paid. Your wish is granted... in its own way.";
   } else if (style === 'evil_genius') {
     finalMessage = "The operation was a success. The world will soon feel the impact.";
+  } else if (isIncompetent) {
+    finalMessage = "I give up. I'm so sorry, I just... I can't do this. Please ask someone else.";
   }
 
   items.push({

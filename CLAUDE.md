@@ -37,11 +37,12 @@ Generates fake execution plans:
 
 ### Style Personas
 
-Four distinct styles affect both plan generation prompts and UI theming:
+Five distinct styles affect both plan generation prompts and UI theming:
 - **absurd** - High-tech hacker jargon, absurd references
 - **grounded** - Professional corporate assistant
 - **evil_genius** - Ruthless dangerous operative
 - **monkeys_paw** - Supernatural wish-granter with dark twists (uses purple accent)
+- **incompetent** - Confused agent that keeps messing up and eventually gives up (uses red accent)
 
 ## Tech Stack
 
@@ -65,5 +66,6 @@ Dark theme with accent colors defined in `index.css`:
 - `--accent-primary: #4dd4b5` (teal)
 - `--accent-warm: #f59e0b` (orange, fast-forward)
 - `--accent-mystic: #a855f7` (purple, Monkey's Paw)
+- `--accent-incompetent: #ef4444` (red, Incompetent)
 
 Fonts: DM Sans (UI), Space Grotesk (display), JetBrains Mono (code)
