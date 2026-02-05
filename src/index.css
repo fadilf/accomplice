@@ -1,33 +1,168 @@
 @import "tailwindcss";
-@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap");
 
 :root {
-  --bg-main: #0f131a;
-  --bg-panel: #151a24;
-  --bg-elevated: #1b2230;
-  --bg-soft: rgba(20, 26, 36, 0.72);
+  /* Richer dark backgrounds */
+  --bg-main: #080b12;
+  --bg-panel: #0d1220;
+  --bg-elevated: #141c2e;
+  --bg-soft: rgba(13, 18, 32, 0.72);
   --text-primary: #f4f6fb;
   --text-secondary: #c7cfdd;
   --text-dim: #93a0b4;
   --border-color: rgba(148, 163, 184, 0.26);
+
+  /* Default accents (will be overridden by style classes) */
   --accent-primary: #4dd4b5;
   --accent-strong: #1fc7a1;
+  --accent-secondary: #00d4ff;
   --accent-warm: #f59e0b;
-  --accent-mystic: #a855f7;
-  --accent-incompetent: #ef4444;
-  --font-ui: "DM Sans", "Segoe UI", "Helvetica Neue", "Noto Sans", sans-serif;
-  --font-display: "Space Grotesk", "DM Sans", "Segoe UI", sans-serif;
-  --font-mono: "JetBrains Mono", "SFMono-Regular", "Menlo", monospace;
+
+  /* Active accent (set by style class) */
+  --active-accent: var(--accent-primary);
+  --active-accent-secondary: var(--accent-secondary);
+
+  /* 90s Corporate Enterprise Fonts */
+  --font-ui: "IBM Plex Sans", "Segoe UI", sans-serif;
+  --font-display: "Barlow Condensed", "Arial Narrow", sans-serif;
+  --font-mono: "IBM Plex Mono", "Consolas", monospace;
+
+  /* Style-specific visual properties */
+  --style-radius: 8px;
+  --style-border-style: solid;
 }
+
+/* ==============================================
+   STYLE-SPECIFIC THEMES
+   ============================================== */
+
+/* ABSURD - Matrix green, cyberpunk hacker */
+.style-absurd {
+  --active-accent: #00ff88;
+  --active-accent-secondary: #00d4ff;
+  --accent-primary: #00ff88;
+  --accent-strong: #00cc6e;
+  --style-radius: 4px;
+}
+
+.style-absurd .font-display {
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.style-absurd .message-agent {
+  border-left: 3px solid var(--active-accent);
+}
+
+.style-absurd .avatar-agent {
+  background: linear-gradient(135deg, #00cc6e, #00ff88);
+  box-shadow: 0 12px 24px rgba(0, 255, 136, 0.35);
+}
+
+/* GROUNDED - Professional bright blue */
+.style-grounded {
+  --active-accent: #3b82f6;
+  --active-accent-secondary: #6366f1;
+  --accent-primary: #3b82f6;
+  --accent-strong: #2563eb;
+  --style-radius: 8px;
+}
+
+.style-grounded .avatar-agent {
+  background: linear-gradient(135deg, #2563eb, #3b82f6);
+  box-shadow: 0 12px 24px rgba(59, 130, 246, 0.35);
+}
+
+.style-grounded .message-agent {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+/* EVIL GENIUS - Hot red-pink, menacing */
+.style-evil_genius {
+  --active-accent: #ff2d55;
+  --active-accent-secondary: #ff6b35;
+  --accent-primary: #ff2d55;
+  --accent-strong: #e6003a;
+  --style-radius: 4px;
+}
+
+.style-evil_genius .avatar-agent {
+  background: linear-gradient(135deg, #e6003a, #ff2d55);
+  box-shadow: 0 12px 24px rgba(255, 45, 85, 0.4), 0 0 30px rgba(255, 45, 85, 0.2);
+}
+
+.style-evil_genius .message-agent {
+  border: 1px solid rgba(255, 45, 85, 0.3);
+  box-shadow: 0 0 20px rgba(255, 45, 85, 0.1);
+}
+
+@keyframes evilPulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(255, 45, 85, 0.1); }
+  50% { box-shadow: 0 0 30px rgba(255, 45, 85, 0.2); }
+}
+
+.style-evil_genius .message-agent {
+  animation: evilPulse 3s ease-in-out infinite;
+}
+
+/* MONKEY'S PAW - Bright violet, eldritch */
+.style-monkeys_paw {
+  --active-accent: #bf5af2;
+  --active-accent-secondary: #5e5ce6;
+  --accent-primary: #bf5af2;
+  --accent-strong: #a644d6;
+  --accent-mystic: #bf5af2;
+  --style-radius: 16px;
+}
+
+.style-monkeys_paw .font-display {
+  font-style: italic;
+}
+
+.style-monkeys_paw .avatar-agent {
+  background: linear-gradient(135deg, #5e5ce6, #bf5af2);
+  box-shadow: 0 12px 24px rgba(191, 90, 242, 0.4);
+}
+
+.style-monkeys_paw .message-agent {
+  background: linear-gradient(135deg, rgba(22, 29, 40, 0.78), rgba(40, 25, 55, 0.78));
+  border-radius: 16px;
+}
+
+/* INCOMPETENT - Warning orange, chaotic */
+.style-incompetent {
+  --active-accent: #ff9f0a;
+  --active-accent-secondary: #ffd60a;
+  --accent-primary: #ff9f0a;
+  --accent-strong: #e68a00;
+  --accent-incompetent: #ff9f0a;
+  --style-radius: 12px;
+  --style-border-style: dashed;
+}
+
+.style-incompetent .avatar-agent {
+  background: linear-gradient(135deg, #e68a00, #ff9f0a);
+  box-shadow: 0 12px 24px rgba(255, 159, 10, 0.35);
+  transform: rotate(-3deg);
+}
+
+.style-incompetent .message-agent {
+  border: 1px dashed rgba(255, 159, 10, 0.4);
+  border-radius: 12px;
+}
+
+/* ==============================================
+   BASE STYLES
+   ============================================== */
 
 body {
   margin: 0;
   padding: 0;
   background-color: var(--bg-main);
   background-image:
-    radial-gradient(1200px circle at 12% -10%, rgba(77, 212, 181, 0.18), transparent 60%),
-    radial-gradient(900px circle at 88% -20%, rgba(248, 113, 113, 0.14), transparent 55%),
-    linear-gradient(180deg, #0f131a 0%, #0c1016 100%);
+    radial-gradient(1200px circle at 12% -10%, rgba(77, 212, 181, 0.12), transparent 60%),
+    radial-gradient(900px circle at 88% -20%, rgba(248, 113, 113, 0.1), transparent 55%),
+    linear-gradient(180deg, #080b12 0%, #050810 100%);
   color: var(--text-primary);
   font-family: var(--font-ui);
   height: 100vh;
@@ -42,7 +177,7 @@ body {
   width: 100%;
 }
 
-/* Scrollbar - ChatGPT style */
+/* Scrollbar - Corporate style */
 ::-webkit-scrollbar {
   width: 6px;
 }
@@ -60,9 +195,12 @@ body {
   background: rgba(148, 163, 184, 0.45);
 }
 
-/* Utility classes */
+/* ==============================================
+   UTILITY CLASSES
+   ============================================== */
+
 .text-accent {
-  color: var(--accent-primary);
+  color: var(--active-accent);
 }
 
 .text-dim {
@@ -71,41 +209,74 @@ body {
 
 .font-display {
   font-family: var(--font-display);
-  letter-spacing: -0.02em;
+  letter-spacing: 0.02em;
+  font-weight: 600;
 }
 
+/* ==============================================
+   LAYOUT COMPONENTS
+   ============================================== */
+
 .app-shell {
-  background: linear-gradient(180deg, rgba(15, 19, 26, 0.75), rgba(15, 19, 26, 0.95));
+  background: linear-gradient(180deg, rgba(8, 11, 18, 0.75), rgba(8, 11, 18, 0.95));
 }
 
 .app-header {
-  background: rgba(15, 19, 26, 0.7);
+  background: rgba(8, 11, 18, 0.85);
   border-bottom: 1px solid var(--border-color);
   backdrop-filter: blur(14px);
+}
+
+/* Header title with gradient */
+.header-title {
+  background: linear-gradient(135deg, var(--text-primary), var(--active-accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .surface {
   background: var(--bg-soft);
   border: 1px solid var(--border-color);
-  box-shadow: 0 18px 40px rgba(9, 12, 17, 0.55), 0 2px 8px rgba(9, 12, 17, 0.35);
+  box-shadow: 0 18px 40px rgba(5, 8, 16, 0.55), 0 2px 8px rgba(5, 8, 16, 0.35);
 }
 
+/* ==============================================
+   MESSAGE CARDS
+   ============================================== */
+
 .message-card {
-  border-radius: 18px;
+  border-radius: var(--style-radius);
   border: 1px solid var(--border-color);
-  background: rgba(17, 22, 30, 0.8);
+  background: rgba(13, 18, 32, 0.8);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .message-user {
-  background: rgba(14, 19, 27, 0.75);
+  background: rgba(10, 14, 22, 0.75);
 }
 
 .message-agent {
-  background: rgba(22, 29, 40, 0.78);
+  background: rgba(20, 28, 46, 0.78);
   overflow: hidden;
+  position: relative;
 }
+
+/* Top accent line for agent messages */
+.message-agent::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--active-accent), transparent);
+}
+
+/* ==============================================
+   AVATARS
+   ============================================== */
 
 .avatar-user {
   background: linear-gradient(135deg, #64748b, #94a3b8);
@@ -114,9 +285,13 @@ body {
 }
 
 .avatar-agent {
-  background: linear-gradient(135deg, #1fc7a1, #4dd4b5);
+  background: linear-gradient(135deg, var(--accent-strong), var(--active-accent));
   box-shadow: 0 12px 24px rgba(77, 212, 181, 0.35);
 }
+
+/* ==============================================
+   HERO SECTION
+   ============================================== */
 
 .hero-title {
   color: var(--text-primary);
@@ -131,18 +306,51 @@ body {
   filter: drop-shadow(0 12px 24px rgba(77, 212, 181, 0.25));
 }
 
+/* ==============================================
+   SUGGESTION CHIPS - Monospace, 90s corporate
+   ============================================== */
+
 .chip {
-  background: rgba(18, 24, 33, 0.75);
-  border: 1px solid rgba(148, 163, 184, 0.2);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  background: rgba(13, 18, 32, 0.85);
+  border: 1px solid rgba(148, 163, 184, 0.25);
   color: var(--text-secondary);
-  transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+  transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
 }
 
 .chip:hover {
-  background: rgba(24, 34, 48, 0.75);
-  border-color: rgba(77, 212, 181, 0.6);
-  transform: translateY(-1px) scale(1.02);
+  background: rgba(20, 28, 46, 0.9);
+  border-color: var(--active-accent);
+  color: var(--text-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), 0 0 20px rgba(77, 212, 181, 0.15);
 }
+
+/* Style-specific chip hover glow */
+.style-absurd .chip:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), 0 0 20px rgba(0, 255, 136, 0.2);
+}
+
+.style-grounded .chip:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), 0 0 20px rgba(59, 130, 246, 0.2);
+}
+
+.style-evil_genius .chip:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), 0 0 20px rgba(255, 45, 85, 0.2);
+}
+
+.style-monkeys_paw .chip:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), 0 0 20px rgba(191, 90, 242, 0.2);
+}
+
+.style-incompetent .chip:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), 0 0 20px rgba(255, 159, 10, 0.2);
+}
+
+/* ==============================================
+   BUTTONS
+   ============================================== */
 
 .icon-button {
   color: var(--text-dim);
@@ -154,21 +362,50 @@ body {
   background: rgba(255, 255, 255, 0.08);
 }
 
+/* ==============================================
+   INPUT AREA
+   ============================================== */
+
 .input-shell {
-  background: rgba(16, 21, 30, 0.9);
-  border: 1px solid rgba(148, 163, 184, 0.2);
-  box-shadow: 0 20px 45px rgba(10, 15, 22, 0.5);
+  background: rgba(13, 18, 32, 0.95);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  box-shadow: 0 20px 45px rgba(5, 8, 16, 0.5);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .input-shell:focus-within {
-  border-color: rgba(77, 212, 181, 0.6);
-  box-shadow: 0 20px 45px rgba(10, 15, 22, 0.5), 0 0 0 3px rgba(77, 212, 181, 0.12);
+  border-color: var(--active-accent);
+  box-shadow: 0 20px 45px rgba(5, 8, 16, 0.5), 0 0 0 3px rgba(77, 212, 181, 0.15), 0 0 30px rgba(77, 212, 181, 0.1);
+}
+
+/* Style-specific focus rings */
+.style-absurd .input-shell:focus-within {
+  box-shadow: 0 20px 45px rgba(5, 8, 16, 0.5), 0 0 0 3px rgba(0, 255, 136, 0.2), 0 0 30px rgba(0, 255, 136, 0.1);
+}
+
+.style-grounded .input-shell:focus-within {
+  box-shadow: 0 20px 45px rgba(5, 8, 16, 0.5), 0 0 0 3px rgba(59, 130, 246, 0.2), 0 0 30px rgba(59, 130, 246, 0.1);
+}
+
+.style-evil_genius .input-shell:focus-within {
+  box-shadow: 0 20px 45px rgba(5, 8, 16, 0.5), 0 0 0 3px rgba(255, 45, 85, 0.2), 0 0 30px rgba(255, 45, 85, 0.1);
+}
+
+.style-monkeys_paw .input-shell:focus-within {
+  box-shadow: 0 20px 45px rgba(5, 8, 16, 0.5), 0 0 0 3px rgba(191, 90, 242, 0.2), 0 0 30px rgba(191, 90, 242, 0.1);
+}
+
+.style-incompetent .input-shell:focus-within {
+  box-shadow: 0 20px 45px rgba(5, 8, 16, 0.5), 0 0 0 3px rgba(255, 159, 10, 0.2), 0 0 30px rgba(255, 159, 10, 0.1);
 }
 
 .input-text {
   color: var(--text-primary);
 }
+
+/* ==============================================
+   SEND BUTTON
+   ============================================== */
 
 .send-button {
   color: var(--text-dim);
@@ -177,14 +414,39 @@ body {
 
 .send-button:not(:disabled) {
   color: #0b1016;
-  background: linear-gradient(135deg, var(--accent-primary), var(--accent-strong));
-  box-shadow: 0 10px 20px rgba(31, 199, 161, 0.35);
+  background: linear-gradient(135deg, var(--active-accent), var(--accent-strong));
+  box-shadow: 0 10px 20px rgba(77, 212, 181, 0.35);
 }
 
 .send-button:not(:disabled):hover {
   transform: translateY(-1px);
-  box-shadow: 0 14px 28px rgba(31, 199, 161, 0.4);
+  box-shadow: 0 14px 28px rgba(77, 212, 181, 0.4);
 }
+
+/* Style-specific send button shadows */
+.style-absurd .send-button:not(:disabled) {
+  box-shadow: 0 10px 20px rgba(0, 255, 136, 0.35);
+}
+
+.style-grounded .send-button:not(:disabled) {
+  box-shadow: 0 10px 20px rgba(59, 130, 246, 0.35);
+}
+
+.style-evil_genius .send-button:not(:disabled) {
+  box-shadow: 0 10px 20px rgba(255, 45, 85, 0.35);
+}
+
+.style-monkeys_paw .send-button:not(:disabled) {
+  box-shadow: 0 10px 20px rgba(191, 90, 242, 0.35);
+}
+
+.style-incompetent .send-button:not(:disabled) {
+  box-shadow: 0 10px 20px rgba(255, 159, 10, 0.35);
+}
+
+/* ==============================================
+   FAST FORWARD
+   ============================================== */
 
 .ff-active {
   color: #0b1016;
@@ -193,10 +455,13 @@ body {
 }
 
 .ff-active:hover {
-  background: #fca5a5;
-  /* Slightly lighter orange/warm */
+  background: #fbbf24;
   transform: scale(1.05);
 }
+
+/* ==============================================
+   ANIMATIONS
+   ============================================== */
 
 .animate-in {
   animation-duration: 0.2s;
@@ -213,53 +478,10 @@ body {
     opacity: 0;
     transform: scale(0.95) translateY(-10px);
   }
-
   to {
     opacity: 1;
     transform: scale(1) translateY(0);
   }
-}
-
-
-.dialog-surface {
-  background: rgba(18, 24, 34, 0.95);
-  border: 1px solid rgba(148, 163, 184, 0.28);
-  box-shadow: 0 30px 70px rgba(7, 10, 16, 0.7);
-}
-
-.settings-option {
-  background: rgba(21, 28, 40, 0.7);
-  border: 1px solid transparent;
-  transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
-}
-
-.settings-option:hover {
-  background: rgba(25, 34, 48, 0.85);
-  transform: translateY(-1px);
-}
-
-.settings-option.is-active {
-  border-color: rgba(77, 212, 181, 0.6);
-  background: rgba(20, 34, 44, 0.9);
-  box-shadow: inset 0 0 0 1px rgba(77, 212, 181, 0.25);
-}
-
-.settings-option.is-active-evil {
-  border-color: rgba(239, 68, 68, 0.6);
-  background: rgba(34, 20, 20, 0.9);
-  box-shadow: inset 0 0 0 1px rgba(239, 68, 68, 0.25);
-}
-
-.settings-option.is-active-mystic {
-  border-color: rgba(168, 85, 247, 0.6);
-  background: rgba(28, 20, 34, 0.9);
-  box-shadow: inset 0 0 0 1px rgba(168, 85, 247, 0.25);
-}
-
-.settings-option.is-active-incompetent {
-  border-color: rgba(239, 68, 68, 0.6);
-  background: rgba(34, 20, 20, 0.9);
-  box-shadow: inset 0 0 0 1px rgba(239, 68, 68, 0.25);
 }
 
 /* Smooth fade-in animation */
@@ -268,7 +490,6 @@ body {
     opacity: 0;
     transform: translateY(4px);
   }
-
   to {
     opacity: 1;
     transform: translateY(0);
@@ -281,14 +502,10 @@ body {
 
 /* Typing indicator */
 @keyframes blink {
-
-  0%,
-  50% {
+  0%, 50% {
     opacity: 1;
   }
-
-  51%,
-  100% {
+  51%, 100% {
     opacity: 0;
   }
 }
@@ -299,12 +516,9 @@ body {
 
 /* Subtle pulse for loading states */
 @keyframes gentlePulse {
-
-  0%,
-  100% {
+  0%, 100% {
     opacity: 1;
   }
-
   50% {
     opacity: 0.5;
   }
@@ -323,4 +537,69 @@ body {
 
 .spinner {
   animation: spin 1s linear infinite;
+}
+
+/* ==============================================
+   DIALOG & SETTINGS
+   ============================================== */
+
+.dialog-surface {
+  background: rgba(13, 18, 32, 0.95);
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  box-shadow: 0 30px 70px rgba(5, 8, 16, 0.7);
+}
+
+.settings-option {
+  background: rgba(20, 28, 46, 0.7);
+  border: 1px solid transparent;
+  transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+}
+
+.settings-option:hover {
+  background: rgba(25, 35, 55, 0.85);
+  transform: translateY(-1px);
+}
+
+.settings-option.is-active {
+  border-color: rgba(77, 212, 181, 0.6);
+  background: rgba(20, 34, 44, 0.9);
+  box-shadow: inset 0 0 0 1px rgba(77, 212, 181, 0.25);
+}
+
+.settings-option.is-active-evil {
+  border-color: rgba(255, 45, 85, 0.6);
+  background: rgba(34, 20, 25, 0.9);
+  box-shadow: inset 0 0 0 1px rgba(255, 45, 85, 0.25);
+}
+
+.settings-option.is-active-mystic {
+  border-color: rgba(191, 90, 242, 0.6);
+  background: rgba(32, 20, 40, 0.9);
+  box-shadow: inset 0 0 0 1px rgba(191, 90, 242, 0.25);
+}
+
+.settings-option.is-active-incompetent {
+  border-color: rgba(255, 159, 10, 0.6);
+  background: rgba(34, 28, 20, 0.9);
+  box-shadow: inset 0 0 0 1px rgba(255, 159, 10, 0.25);
+}
+
+/* ==============================================
+   COMPLETION BADGES
+   ============================================== */
+
+.completion-badge {
+  color: var(--active-accent);
+}
+
+.completion-badge-mystic {
+  color: #bf5af2;
+}
+
+.completion-badge-incompetent {
+  color: #ff9f0a;
+}
+
+.completion-badge-evil {
+  color: #ff2d55;
 }
