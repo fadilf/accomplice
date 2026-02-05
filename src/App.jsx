@@ -68,7 +68,8 @@ function App() {
     { id: 'absurd', label: 'Absurd', icon: '🎭' },
     { id: 'grounded', label: 'Grounded', icon: '💼' },
     { id: 'evil_genius', label: 'Evil Genius', icon: '🦹' },
-    { id: 'monkeys_paw', label: 'Monkey\'s Paw', icon: '🐒' }
+    { id: 'monkeys_paw', label: 'Monkey\'s Paw', icon: '🐒' },
+    { id: 'incompetent', label: 'Incompetent', icon: '🤦' }
   ];
 
   const currentStyleLabel = STYLES.find(s => s.id === settings.style)?.label || 'Style';

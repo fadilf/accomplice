@@ -44,9 +44,27 @@ const MONKEYS_PAW_TASKS = [
     "I wish I could see into the future"
 ];
 
+const INCOMPETENT_TASKS = [
+    "Help me send an email to my boss",
+    "Change my desktop wallpaper",
+    "Open a new browser tab",
+    "Help me rename a file",
+    "Find where I saved that document",
+    "Help me copy and paste some text",
+    "Turn up the volume on my computer",
+    "Connect to WiFi",
+    "Help me print something",
+    "Open Microsoft Word"
+];
+
 const getRandomSuggestions = (style, count = 3) => {
     if (style === 'monkeys_paw') {
         const shuffled = [...MONKEYS_PAW_TASKS].sort(() => Math.random() - 0.5);
+        return shuffled.slice(0, count);
+    }
+
+    if (style === 'incompetent') {
+        const shuffled = [...INCOMPETENT_TASKS].sort(() => Math.random() - 0.5);
         return shuffled.slice(0, count);
     }
 
