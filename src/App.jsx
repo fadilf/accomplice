@@ -140,33 +140,33 @@ function App() {
       <div className={`h-screen flex flex-col app-shell style-${settings.style}`}>
         {/* Landing Content */}
         <main className="flex-1 flex items-center justify-center relative z-[1]">
-          <div className="landing-container flex items-center gap-12 max-w-4xl w-full px-8">
+          <div className="landing-container flex flex-col md:flex-row items-center gap-6 md:gap-12 max-w-4xl w-full px-4 md:px-8">
             {/* Logo on Left */}
             <div className="landing-logo flex flex-col items-center">
-              <img src="/logo.png" alt="Accomplice Logo" className="w-28 h-28 logo-mark" />
-              <h1 className="font-display header-title text-2xl font-bold mt-4 whitespace-nowrap">Accomplice</h1>
+              <img src="/logo.png" alt="Accomplice Logo" className="w-20 h-20 md:w-28 md:h-28 logo-mark" />
+              <h1 className="font-display header-title text-xl md:text-2xl font-bold mt-3 md:mt-4 whitespace-nowrap">Accomplice</h1>
             </div>
 
             {/* Search Area */}
             <div className="flex-1 flex flex-col">
               {/* Mode Tabs */}
-              <div className="mode-tabs flex justify-center gap-1 mb-2">
+              <div className="mode-tabs flex flex-wrap justify-center gap-1 mb-2">
                 {STYLES.map((style) => (
                   <button
                     key={style.id}
                     onClick={() => setSettings({ ...settings, style: style.id })}
-                    className={`mode-tab flex flex-col items-center px-4 py-2 rounded-t-lg transition-all ${
+                    className={`mode-tab flex flex-col items-center px-2 py-1.5 md:px-4 md:py-2 rounded-t-lg transition-all ${
                       settings.style === style.id ? 'mode-tab-active' : ''
                     }`}
                   >
-                    <span className="text-2xl mb-1">{style.icon}</span>
-                    <span className="text-xs font-medium">{style.label}</span>
+                    <span className="text-xl md:text-2xl mb-0.5 md:mb-1">{style.icon}</span>
+                    <span className="text-[10px] md:text-xs font-medium hidden sm:block">{style.label}</span>
                   </button>
                 ))}
               </div>
 
               {/* Search Box */}
-              <div className="landing-search-box p-4 rounded-xl">
+              <div className="landing-search-box p-3 md:p-4 rounded-xl w-full">
                 <form onSubmit={handleLandingSubmit} className="flex gap-3">
                   <input
                     ref={landingInputRef}
@@ -187,7 +187,7 @@ function App() {
               </div>
 
               {/* Suggestions */}
-              <div className="mt-4 flex flex-wrap items-center gap-2 justify-center">
+              <div className="mt-3 md:mt-4 flex flex-wrap items-center gap-1.5 md:gap-2 justify-center">
                 {suggestions.map((suggestion, index) => (
                   <button
                     key={index}
@@ -212,7 +212,7 @@ function App() {
         </main>
 
         {/* Disclaimer Footer */}
-        <footer className="py-4 text-center relative z-[1]">
+        <footer className="py-4 text-center relative z-[1] px-4 md:px-0">
           <p className="text-xs" style={{ color: 'var(--text-dim)' }}>
             Accomplice may cause catastrophic consequences. Use wisely... or don't.
           </p>
