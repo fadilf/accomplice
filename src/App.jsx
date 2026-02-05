@@ -1,8 +1,58 @@
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import ChatInterface from './components/ChatInterface';
 import AgentResponse from './components/AgentResponse';
 import { generatePlan } from './lib/simulator';
+
+const REGULAR_TASKS = [
+  "Help me write a heartfelt apology to my houseplant for forgetting to water it",
+  "Create a detailed business plan for a cat café on the moon",
+  "Write a strongly-worded email to the sun requesting less brightness",
+  "Plan a surprise birthday party for my pet rock",
+  "Design a foolproof system to never lose my socks again",
+  "Help me negotiate a peace treaty between my dog and the mailman",
+];
+
+const EVIL_TASKS = [
+  "Plan a digital heist to redirect fractions of pennies into my offshore account",
+  "Help me infiltrate the neighborhood watch to secure better parking",
+  "Establish a monopoly on the office coffee supply through ruthless negotiation",
+];
+
+const MONKEYS_PAW_TASKS = [
+  "I wish my family never had to worry about money again",
+  "I wish my house was perfectly clean and silent",
+  "I wish I could fly",
+  "I wish for eternal world peace",
+];
+
+const INCOMPETENT_TASKS = [
+  "Help me send an email to my boss",
+  "Change my desktop wallpaper",
+  "Open a new browser tab",
+  "Help me copy and paste some text",
+];
+
+const getRandomSuggestions = (style, count = 3) => {
+  if (style === 'monkeys_paw') {
+    return [...MONKEYS_PAW_TASKS].sort(() => Math.random() - 0.5).slice(0, count);
+  }
+  if (style === 'incompetent') {
+    return [...INCOMPETENT_TASKS].sort(() => Math.random() - 0.5).slice(0, count);
+  }
+  const shuffledRegular = [...REGULAR_TASKS].sort(() => Math.random() - 0.5);
+  const shuffledEvil = [...EVIL_TASKS].sort(() => Math.random() - 0.5);
+  const selection = [...shuffledRegular.slice(0, count - 1), shuffledEvil[0]];
+  return selection.sort(() => Math.random() - 0.5);
+};
+
+const STYLES = [
+  { id: 'absurd', label: 'Absurd', icon: '🎭' },
+  { id: 'grounded', label: 'Grounded', icon: '💼' },
+  { id: 'evil_genius', label: 'Evil Genius', icon: '🦹' },
+  { id: 'monkeys_paw', label: "Monkey's Paw", icon: '🐒' },
+  { id: 'incompetent', label: 'Incompetent', icon: '🤦' }
+];
 
 function App() {
   const [messages, setMessages] = useState([]);
@@ -21,9 +71,20 @@ function App() {
   useEffect(() => {
     localStorage.setItem('accomplice_settings', JSON.stringify(settings));
   }, [settings]);
+
   const [isFastForward, setIsFastForward] = useState(false);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [landingInput, setLandingInput] = useState('');
+  const [suggestionKey, setSuggestionKey] = useState(0);
   const messagesEndRef = useRef(null);
+  const landingInputRef = useRef(null);
+
+  const suggestions = useMemo(
+    () => getRandomSuggestions(settings.style),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [settings.style, suggestionKey]
+  );
+
+  const refreshSuggestions = () => setSuggestionKey(k => k + 1);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -34,11 +95,9 @@ function App() {
   }, [messages, currentPlan]);
 
   const handleSend = async (text) => {
-    // Add user message
     const userMsg = { id: Date.now(), role: 'user', content: text };
     const agentMsgId = Date.now() + 1;
 
-    // Add agent message immediately with null plan to show thinking state
     const agentMsg = {
       id: agentMsgId,
       role: 'agent',
@@ -49,14 +108,13 @@ function App() {
 
     setMessages(prev => [...prev, userMsg, agentMsg]);
     setIsProcessing(true);
+    setLandingInput('');
 
-    // Generate the plan
     const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
     const plan = await generatePlan(text, apiKey, settings.style);
 
     setCurrentPlan(plan);
 
-    // Update the agent message with the plan
     setMessages(prev => prev.map(msg =>
       msg.id === agentMsgId ? { ...msg, plan } : msg
     ));
@@ -64,83 +122,142 @@ function App() {
 
   const handleCompletion = () => {
     setIsProcessing(false);
-    setIsFastForward(false); // Reset fast forward when task completes
+    setIsFastForward(false);
   };
 
-  const STYLES = [
-    { id: 'absurd', label: 'Absurd', icon: '🎭' },
-    { id: 'grounded', label: 'Grounded', icon: '💼' },
-    { id: 'evil_genius', label: 'Evil Genius', icon: '🦹' },
-    { id: 'monkeys_paw', label: 'Monkey\'s Paw', icon: '🐒' },
-    { id: 'incompetent', label: 'Incompetent', icon: '🤦' }
-  ];
+  const handleLandingSubmit = (e) => {
+    e.preventDefault();
+    if (landingInput.trim()) {
+      handleSend(landingInput.trim());
+    }
+  };
 
-  const currentStyleLabel = STYLES.find(s => s.id === settings.style)?.label || 'Style';
-  const currentStyleIcon = STYLES.find(s => s.id === settings.style)?.icon || '⚙️';
+  const isLanding = messages.length === 0;
 
-  return (
-    <div className={`h-screen flex flex-col app-shell style-${settings.style}`}>
-      {/* Header */}
-      <header className="flex items-center justify-between px-4 py-3 app-header">
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2">
-            <div className={`w-2 h-2 rounded-full ${isProcessing ? 'gentle-pulse' : 'bg-gray-500'}`} style={{ backgroundColor: isProcessing ? 'var(--active-accent)' : undefined }}></div>
-            <h1 className="text-base font-semibold font-display header-title">Accomplice</h1>
-          </div>
-        </div>
-        <div className="relative">
-          <button
-            onClick={() => setDropdownOpen(!dropdownOpen)}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200 hover:bg-white/5 active:scale-95"
-            style={{ border: '1px solid var(--border-color)', color: 'var(--text-primary)' }}
-          >
-            <span>{currentStyleIcon}</span>
-            <span>{currentStyleLabel}</span>
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={`w-4 h-4 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
-            </svg>
-          </button>
+  // Landing Page Layout
+  if (isLanding) {
+    return (
+      <div className={`h-screen flex flex-col app-shell style-${settings.style}`}>
+        {/* Landing Content */}
+        <main className="flex-1 flex items-center justify-center relative z-[1]">
+          <div className="landing-container flex items-center gap-12 max-w-4xl w-full px-8">
+            {/* Logo on Left */}
+            <div className="landing-logo flex flex-col items-center">
+              <img src="/logo.png" alt="Accomplice Logo" className="w-28 h-28 logo-mark" />
+              <h1 className="font-display header-title text-2xl font-bold mt-4 whitespace-nowrap">Accomplice</h1>
+            </div>
 
-          {dropdownOpen && (
-            <>
-              <div className="fixed inset-0 z-10" onClick={() => setDropdownOpen(false)}></div>
-              <div className="absolute right-0 mt-2 w-48 rounded-xl p-1 z-20 shadow-2xl animate-in fade-in zoom-in duration-200 border border-white/10" style={{ backgroundColor: 'rgb(13, 18, 28)', backdropFilter: 'blur(12px)' }}>
+            {/* Search Area */}
+            <div className="flex-1 flex flex-col">
+              {/* Mode Tabs */}
+              <div className="mode-tabs flex justify-center gap-1 mb-2">
                 {STYLES.map((style) => (
                   <button
                     key={style.id}
-                    onClick={() => {
-                      setSettings({ ...settings, style: style.id });
-                      setDropdownOpen(false);
-                    }}
-                    className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-left transition-colors hover:bg-white/5 ${settings.style === style.id ? 'bg-white/10' : ''}`}
-                    style={{ color: 'var(--text-primary)' }}
+                    onClick={() => setSettings({ ...settings, style: style.id })}
+                    className={`mode-tab flex flex-col items-center px-4 py-2 rounded-t-lg transition-all ${
+                      settings.style === style.id ? 'mode-tab-active' : ''
+                    }`}
                   >
-                    <span>{style.icon}</span>
-                    <span>{style.label}</span>
-                    {settings.style === style.id && (
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4 ml-auto text-emerald-500">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-                      </svg>
-                    )}
+                    <span className="text-2xl mb-1">{style.icon}</span>
+                    <span className="text-xs font-medium">{style.label}</span>
                   </button>
                 ))}
               </div>
-            </>
-          )}
+
+              {/* Search Box */}
+              <div className="landing-search-box p-4 rounded-xl">
+                <form onSubmit={handleLandingSubmit} className="flex gap-3">
+                  <input
+                    ref={landingInputRef}
+                    type="text"
+                    value={landingInput}
+                    onChange={(e) => setLandingInput(e.target.value)}
+                    placeholder="What do you need accomplished?"
+                    className="landing-input flex-1 px-4 py-3 rounded-lg text-sm outline-none"
+                  />
+                  <button
+                    type="submit"
+                    disabled={!landingInput.trim()}
+                    className="landing-submit px-6 py-3 rounded-lg font-semibold text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Go
+                  </button>
+                </form>
+              </div>
+
+              {/* Suggestions */}
+              <div className="mt-4 flex flex-wrap items-center gap-2 justify-center">
+                {suggestions.map((suggestion, index) => (
+                  <button
+                    key={index}
+                    onClick={() => handleSend(suggestion)}
+                    className="px-3 py-1.5 text-xs rounded-full chip"
+                  >
+                    {suggestion}
+                  </button>
+                ))}
+                <button
+                  onClick={refreshSuggestions}
+                  className="p-1.5 rounded-full icon-button"
+                  title="Get new suggestions"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </main>
+
+        {/* Disclaimer Footer */}
+        <footer className="py-4 text-center relative z-[1]">
+          <p className="text-xs" style={{ color: 'var(--text-dim)' }}>
+            Accomplice may cause catastrophic consequences. Use wisely... or don't.
+          </p>
+        </footer>
+      </div>
+    );
+  }
+
+  // Chat Interface Layout
+  return (
+    <div className={`h-screen flex flex-col app-shell style-${settings.style}`}>
+      {/* Chat Header */}
+      <header className="flex items-center justify-between px-4 py-3 app-header">
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setMessages([])}
+            className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+          >
+            <img src="/logo.png" alt="Accomplice Logo" className="w-10 h-10 header-logo" />
+            <h1 className="text-base font-semibold font-display header-title">Accomplice</h1>
+          </button>
+          <div className={`w-2 h-2 rounded-full ${isProcessing ? 'gentle-pulse' : 'bg-gray-500'}`} style={{ backgroundColor: isProcessing ? 'var(--active-accent)' : undefined }}></div>
+        </div>
+
+        {/* Mode selector in header */}
+        <div className="flex items-center gap-1">
+          {STYLES.map((style) => (
+            <button
+              key={style.id}
+              onClick={() => !isProcessing && setSettings({ ...settings, style: style.id })}
+              disabled={isProcessing}
+              className={`header-mode-btn p-2 rounded-lg transition-all ${
+                settings.style === style.id ? 'header-mode-btn-active' : ''
+              } ${isProcessing ? 'opacity-50 cursor-not-allowed' : ''}`}
+            >
+              <span className="text-lg">{style.icon}</span>
+              <span className="tooltip">{style.label}</span>
+            </button>
+          ))}
         </div>
       </header>
 
       {/* Messages */}
-      <main className="flex-1 overflow-y-auto">
+      <main className="flex-1 overflow-y-auto relative z-[1]">
         <div className="max-w-3xl mx-auto px-4 py-8">
-          {messages.length === 0 && (
-            <div className="flex flex-col items-center justify-center mt-32 text-center">
-              <img src="/logo.png" alt="Accomplice Logo" className="w-16 h-16 mb-6 logo-mark" />
-              <h2 className="font-display hero-title font-semibold mb-2">How can I help you today?</h2>
-              <p className="text-sm hero-subtitle">Ask me anything and I'll help you accomplish it.</p>
-            </div>
-          )}
-
           <div className="flex flex-col gap-6">
             {messages.map((msg) => (
               <div key={msg.id} className="fade-in">
@@ -179,7 +296,7 @@ function App() {
         </div>
       </main>
 
-      <div className="px-4 py-5">
+      <div className="px-4 py-5 relative z-[1]">
         <ChatInterface
           onSend={handleSend}
           disabled={isProcessing}

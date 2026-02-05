@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 
 const REGULAR_TASKS = [
     "Help me write a heartfelt apology to my houseplant for forgetting to water it",
@@ -80,17 +80,20 @@ const getRandomSuggestions = (style, count = 3) => {
     return selection.sort(() => Math.random() - 0.5);
 };
 
-const ChatInterface = ({ onSend, disabled, settings, isFastForward, onFastForwardToggle }) => {
+const ChatInterface = ({ onSend, disabled, settings, isFastForward, onFastForwardToggle, hideSuggestions = false }) => {
     const [input, setInput] = useState('');
     const textareaRef = useRef(null);
-    const [suggestions, setSuggestions] = useState(() => getRandomSuggestions(settings?.style));
+    const [refreshKey, setRefreshKey] = useState(0);
 
-    useEffect(() => {
-        setSuggestions(getRandomSuggestions(settings?.style));
-    }, [settings?.style]);
+    // refreshKey is intentionally in deps to trigger refresh on button click
+    const suggestions = useMemo(
+        () => getRandomSuggestions(settings?.style),
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [settings?.style, refreshKey]
+    );
 
     const refreshSuggestions = () => {
-        setSuggestions(getRandomSuggestions(settings?.style));
+        setRefreshKey(k => k + 1);
     };
 
     const handleSuggestionClick = (suggestion) => {
@@ -114,7 +117,7 @@ const ChatInterface = ({ onSend, disabled, settings, isFastForward, onFastForwar
     return (
         <div className="max-w-3xl mx-auto">
             {/* Suggested Tasks */}
-            {!disabled && (
+            {!disabled && !hideSuggestions && (
                 <div className="mb-4 flex flex-wrap items-center gap-2 justify-center">
                     {suggestions.map((suggestion, index) => (
                         <button
