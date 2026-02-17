@@ -187,9 +187,6 @@ const ChatInterface = ({ onSend, disabled, settings, isFastForward, onFastForwar
                     </div>
                 </div>
             </form>
-            <p className="text-center text-xs mt-3" style={{ color: 'var(--text-dim)' }}>
-                Accomplice may cause catastrophic consequences. Use wisely... or don't.
-            </p>
         </div>
     );
 };
