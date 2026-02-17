@@ -214,7 +214,7 @@ function App() {
         {/* Disclaimer Footer */}
         <footer className="py-4 text-center relative z-[1] px-4 md:px-0">
           <p className="text-xs" style={{ color: 'var(--text-dim)' }}>
-            Accomplice may cause catastrophic consequences. Use wisely... or don't.
+            Disclaimer: Using Accomplice may end in disaster. But probably not because it doesn't actually do anything.
           </p>
         </footer>
       </div>
@@ -304,6 +304,9 @@ function App() {
           isFastForward={isFastForward}
           onFastForwardToggle={() => setIsFastForward(!isFastForward)}
         />
+        <p className="mt-3 text-center text-xs" style={{ color: 'var(--text-dim)' }}>
+          Disclaimer: Using Accomplice may end in disaster. But probably not because it doesn't actually do anything.
+        </p>
       </div>
     </div>
   );
